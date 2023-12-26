@@ -155,7 +155,7 @@ var ocat = {
 			name: "dm",
 			usage: "<user> <message...>",
 			action: m => {
-				var args = []; //m.split(" ");
+				var args = m.split(" ");
 				args.shift(); // "/dm"
 				function escape(msg) {
 					return msg
