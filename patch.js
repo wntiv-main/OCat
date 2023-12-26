@@ -631,7 +631,7 @@ ocat._hooks.markdown = (name, msg) => {
 		escapedContent = escapedContent.replace(r.regex, (match, content, offset, string) => {
 			matched = true;
 			var el = document.createElement(r.element);
-			e.attr(el);
+			r.attr(el);
 			el.textContent = content;
 			return el.outerHTML;
 		});
