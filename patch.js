@@ -775,6 +775,7 @@ ocat._hooks.pingUsers = () => {
 
 ocat._hooks.updateUserData = (user, data) => {
 	if(!(user in ocat._userHistory)) {
+		if(user.startsWith("[DM] ") || user.startsWith("[OCat] ")) return;
 		var el = document.createElement("li");
 		el.textContent = user;
 		ocat._userHistory[user] = {
