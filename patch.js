@@ -96,13 +96,18 @@ var ocat = {
 	devMessages: false,
 	useMarkdown: false,
 	antiXss: false,
-	_darkmode: false,
-	get darkmode() {
-		return this._darkmode;
+	_theme: "darkmode",
+	get theme() {
+		return this._theme;
 	},
-	set darkmode(value) {
-		this._darkmode = value;
-		document.body.classList.toggle("darkmode", value);
+	set theme(value) {
+		if(!this._themes.includes(value)) {
+			ocat._clientMessage(`"${value}" is not a valid theme. Valid values are: ${this._themes.join(", ")}`);
+			return;
+		}
+		this._theme = value;
+		document.body.classList.remove(...ocat._themes);
+		document.body.classList.add(themeClass);
 	},
 	_notificationSound: "",
 	get notificationSound() {
@@ -251,19 +256,6 @@ ocat._banner.classList.add("ocat-banner");
 ocat_bannerContainer.appendChild(ocat._banner);
 document.getElementById("message-container").prepend(ocat_bannerContainer);
 
-// Load settings
-if(ocat._SETTINGS_KEY in localStorage) {
-	var settings = JSON.parse(localStorage.getItem(ocat._SETTINGS_KEY));
-	for(var key in settings) {
-		if(ocat.hasOwnProperty(key) && !key.startsWith("_")) {
-			ocat[key] = settings[key];
-		}
-	}
-}
-
-if(!ocat.notificationSound)
-	ocat.notificationSound = "https://cdn.pixabay.com/download/audio/2023/03/18/audio_900b6765ed.mp3?filename=the-notification-email-143029.mp3";
-
 document.addEventListener("visibilitychange", () => {
 	if(document.visibilityState === "visible") {
 		// The tab has become visible so clear the now-stale Notification.
@@ -316,7 +308,7 @@ function addStringSettingCommand(name, desc, msgFn, secret = false) {
 };
 
 addToggleSettingCommand("systemNotifications", "Toggles sending system notifications when messages are received.", b => `${b ? "Enabled" : "Disabled"} system notifications`);
-addToggleSettingCommand("darkmode", "Toggles dark mode.", b => `${b ? "Enabled" : "Disabled"} dark mode`);
+addStringSettingCommand("theme", "Sets the theme.", s => `Switched to ${s}`);
 addToggleSettingCommand("useMarkdown", "Allows use of markdown in chat messages.", b => `${b ? "Enabled" : "Disabled"} markdown parser`);
 addToggleSettingCommand("antiXss", "Remove XSS payloads.", b => `${b ? "Now" : "No longer"} checking payloads for XSS.`, true);
 addStringSettingCommand("notificationSound", "Set the notification sound by URL.", s => `Set notification sound to ${s}.`);
@@ -849,8 +841,8 @@ ocat._themes = [];
 		themeButton.classList.add(themeClass);
 		themeButton.addEventListener("click", function(e) {
 			document.getElementById("ocat-theme-tooltip").classList.toggle("ocat-active", false);
-			document.body.classList.remove(...ocat._themes);
-			document.body.classList.add(themeClass);
+			ocat.theme = themeClass;
+			ocat._saveSettings();
 		});
 		themeSelectorTooltip.appendChild(themeButton);
 	}
@@ -1066,6 +1058,19 @@ patch("html-message",
 socket.on("pongUser", user => {
 	ocat._hooks.updateUserData(user, { online: true });
 });
+
+// Load settings
+if(ocat._SETTINGS_KEY in localStorage) {
+	var settings = JSON.parse(localStorage.getItem(ocat._SETTINGS_KEY));
+	for(var key in settings) {
+		if(ocat.hasOwnProperty(key) && !key.startsWith("_")) {
+			ocat[key] = settings[key];
+		}
+	}
+}
+
+if(!ocat.notificationSound)
+	ocat.notificationSound = "https://cdn.pixabay.com/download/audio/2023/03/18/audio_900b6765ed.mp3?filename=the-notification-email-143029.mp3";
 
 ocat._hooks.updateUserData(username, { active: true });
 setInterval(ocat._hooks.pingUsers, 30000);
