@@ -83,7 +83,7 @@ var ocat = {
 						this._systemNotifications = true;
 						ocat._saveSettings();
 					} else {
-						this._clientMessage("Cannot use system notifications without permission.", room);
+						this._clientMessage("Cannot use system notifications without permission.");
 					}
 				});
 			} else {
