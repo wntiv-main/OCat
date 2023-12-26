@@ -1,7 +1,7 @@
 if(!!ocat) throw new Error("Already Injected");
 
 var ocat = {
-	_LAST_SEEN_CCHAT_HASH: -905639842,
+	_LAST_SEEN_CCAT_HASH: -905639842,
 	_notification: new Audio(),
 	_currentNotification: null,
 	_currentBannerColor: "transparent",
@@ -48,7 +48,7 @@ var ocat = {
 		if(document.hasFocus() || document.visibilityState == "visible") return;
 		if(msg.includes("/*ocat-user-ping-message*/")) return;
 		if(this.systemNotifications) {
-			var notif = new Notification(`CChat (${type.toUpperCase()})`, {
+			var notif = new Notification(`CCat (${type.toUpperCase()})`, {
 				body: msg
 			});
 			notif.addEventListener("click", function(e) {
@@ -585,7 +585,6 @@ body {
 .darkmode .ocat-link {
 	color: #00c0ff;
 }
-
 `;
 document.head.appendChild(css);
 
@@ -944,12 +943,12 @@ ocat._hooks.updateUserData(username, { active: true });
 setInterval(ocat._hooks.pingUsers, 30000);
 ocat._bannerMessage("success", "ocat ready!", 3000);
 var ocat_scriptHash = [...document.scripts].find(s => s.textContent).textContent.hashCode();
-if(ocat_scriptHash != ocat._LAST_SEEN_CCHAT_HASH) {
+if(ocat_scriptHash != ocat._LAST_SEEN_CCAT_HASH) {
 	ocat._clientMessage(
-		`CChat has changed since this OCat version has released.
+		`CCat has changed since this OCat version has released.
 Are you using latest version? If so, a new OCat version may be released soon to hide this message.
 OCat may not work as expected during this period, so please remain patient as we update.`);
 	if(ocat.devMessages) {
-		ocat._clientMessage(`CChat script file changed (new hash '${ocat_scriptHash}').`);
+		ocat._clientMessage(`CCat script file changed (new hash '${ocat_scriptHash}').`);
 	}
 }
