@@ -107,7 +107,7 @@ var ocat = {
 		}
 		this._theme = value;
 		document.body.classList.remove(...ocat._themes);
-		document.body.classList.add(themeClass);
+		document.body.classList.add(value);
 	},
 	_notificationSound: "",
 	get notificationSound() {
