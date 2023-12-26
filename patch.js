@@ -634,7 +634,8 @@ body {
 	width: 12px;
 	height: 12px;
 	position: absolute;
-	background: #202020;
+	background: #80808050;
+	backdrop-filter: blur(10px);
 	bottom: -7px;
 	transform: rotate(45deg);
 	border-bottom: 1px solid #777;
