@@ -338,7 +338,7 @@ body {
 .ocat-input-container {
 	display: flex;
 	align-items: center;
-	max-width: 160px;
+	min-width: 160px;
 	background: white;
 	border: 1px solid #a0a0a0;
 	border-radius: 10px;
