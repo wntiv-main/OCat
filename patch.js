@@ -827,6 +827,7 @@ ocat._hooks.antiXss = (msg) => {
 			if(i.name.toLowerCase().startsWith("on")
 				//javascript: url?
 				|| (/href|src/i.test(i.name) && /^(vb|java|live)script:/i.test(i.value))) {
+				if(i.value.includes("/*ocat-user-ping-message*/")) continue;
 				var id = idGenerator();
 				n.classList.add(id);
 				ocat._xssIds[id] = {
