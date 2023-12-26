@@ -485,9 +485,9 @@ body {
 }
 
 #message-container > div:has(> img.ocat-user-ping-message) {
-	padding: none;
+	padding: 0;
 	height: 0px;
-	background: transparent;
+	background: transparent !important;
 }
 
 #ocat-sidebar {
