@@ -275,7 +275,7 @@ function addToggleSettingCommand(name, desc, msgFn, secret = false) {
 		action: m => {
 			var msg = msgFn(ocat[name] = !ocat[name]);
 			ocat._saveSettings();
-			ocat._clientMessage(msg, room);
+			ocat._clientMessage(msg);
 		},
 		description: () => `${desc} Currently: ${ocat[name] ? "enabled" : "disabled"}`
 	});
@@ -292,7 +292,7 @@ function addStringSettingCommand(name, desc, msgFn, secret = false) {
 			args.shift();
 			var msg = msgFn(ocat[name] = args.join(" "));
 			ocat._saveSettings();
-			ocat._clientMessage(msg, room);
+			ocat._clientMessage(msg);
 		},
 		description: () => `${desc} Currently set to: ${ocat[name]}`
 	});
