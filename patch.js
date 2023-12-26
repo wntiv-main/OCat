@@ -464,6 +464,15 @@ body {
 	background: #80808040;
 }
 
+#message-container > div:has(> .opal-left) {
+	display: flex;
+}
+
+#message-container > div > .opal-left {
+	margin-right: 0.5ch;
+	min-width: max-content;
+}
+
 #ocat-member-list {
 	grid-area: member-list;
 	width: 20vw;
