@@ -506,7 +506,7 @@ body {
 	margin: 0;
 	padding: 0;
 	flex-grow: 1;
-	overflow-y: scroll;
+	overflow-y: auto;
 }
 
 #ocat-settings-container {
