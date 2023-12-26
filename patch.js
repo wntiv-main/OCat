@@ -464,11 +464,11 @@ body {
 	background: #80808040;
 }
 
-#message-container > div:has(> .opal-left) {
+#message-container > div:has(> .ocat-left) {
 	display: flex;
 }
 
-#message-container > div > .opal-left {
+#message-container > div > .ocat-left {
 	margin-right: 0.5ch;
 	min-width: max-content;
 }
@@ -578,11 +578,11 @@ body {
 	}
 }
 
-.opal-link {
+.ocat-link {
 	color: blue;
 }
 
-.darkmode .opal-link {
+.darkmode .ocat-link {
 	color: #00c0ff;
 }
 
