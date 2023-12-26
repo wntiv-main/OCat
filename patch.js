@@ -46,7 +46,7 @@ var ocat = {
 	},
 	_notify(msg, type, el) {
 		if(document.hasFocus() || document.visibilityState == "visible") return;
-		if(msg.includes("/*ocat-user-ping-message*/")) return;
+		if(msg.includes("ocat-user-ping-message")) return;
 		if(this.systemNotifications) {
 			var notif = new Notification(`CCat (${type.toUpperCase()})`, {
 				body: msg
