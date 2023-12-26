@@ -446,8 +446,8 @@ body {
 	grid-template-columns: 1fr max-content;
 	grid-template-rows: 1fr auto;
 	grid-template-areas:
-		"chat member-list"
-		"input member-list";
+		"chat sidebar"
+		"input sidebar";
 	width: 100%;
 	height: 100vh;
 	overflow: hidden;
@@ -490,21 +490,32 @@ body {
 	min-width: max-content;
 }
 
-#message-container > div:has(> img[onload*="/*ocat-user-ping-message*/"]) {
+#message-container > div:has(> img.ocat-user-ping-message) {
 	padding: none;
 	height: 0px;
 	background: transparent;
 }
 
-#ocat-member-list {
-	grid-area: member-list;
+#ocat-sidebar {
+	grid-area: sidebar;
 	width: 20vw;
 	min-width: 200px;
 	max-width: 300px;
 	border-left: 1px solid #aaa;
+	display: flex;
+	flex-direction: column;
+}
+
+#ocat-member-list {
 	display: block;
 	margin: 0;
 	padding: 0;
+	flex-grow: 1;
+	overflow-y: scroll;
+}
+
+#ocat-settings-container {
+
 }
 
 #ocat-member-list li {
@@ -573,19 +584,11 @@ body {
 }
 
 .ocat-banner-button:hover {
-	background: #00000030;
+	background: #80808030;
 }
 
 .ocat-banner-button:active {
-	background: #00000050;
-}
-
-.darkmode .ocat-banner-button:hover {
-	background: #ffffff30;
-}
-
-.darkmode .ocat-banner-button:active {
-	background: #ffffff50;
+	background: #80808050;
 }
 
 @keyframes ocat-slide-background {
@@ -603,6 +606,67 @@ body {
 
 .darkmode .ocat-link {
 	color: #00c0ff;
+}
+
+.ocat-tooltip {
+	padding: 5px;
+	margin: 5px;
+	position: absolute;
+	transform: translateY(-100%);
+	top: -10px;
+	background: #202020;
+	border: 1px solid #777;
+	border-radius: 12px;
+	z-index: 1;
+	overflow: visible;
+	display: none;
+}
+
+
+.ocat-tooltip.ocat-active {
+	display: block;
+}
+
+.ocat-tooltip::after {
+	content: "";
+	width: 12px;
+	height: 12px;
+	position: absolute;
+	background: #202020;
+	bottom: -7px;
+	right: 12px;
+	transform: rotate(45deg);
+	border-bottom: 1px solid #777;
+	border-right: 1px solid #777;
+}
+
+#ocat-settings-container {
+	display: flex;
+	flex-direction: row-reverse;
+	position: relative;
+}
+
+.ocat-settings-button {
+	padding: 8px;
+	min-width: 1em;
+	min-height: 1em;
+	border: 1px solid #777;
+	box-sizing: content-box;
+	border-radius: 8px;
+	margin: 5px;
+	background-size: cover;
+}
+
+.ocat-settings-button:not([class*="theme"]):not([class*="mode"]) {
+	background: transparent;
+}
+
+.ocat-settings-button:not([class*="theme"]):not([class*="mode"]):hover {
+	background: #80808030;
+}
+
+.ocat-settings-button:not([class*="theme"]):not([class*="mode"]):active {
+	background: #80808050;
 }
 `;
 document.head.appendChild(css);
@@ -750,15 +814,56 @@ messageToolbar.prepend(nameSelector);
 
 document.getElementById("message-input").replaceWith(messageToolbar);
 
+var sidebar = document.createElement("div");
+sidebar.id = "ocat-sidebar";
+
 var memberList = document.createElement("ul");
 memberList.id = "ocat-member-list";
-document.body.appendChild(memberList);
+sidebar.appendChild(memberList);
+
+var settinsContainer = document.createElement("div");
+settinsContainer.id = "ocat-settings-container";
+
+var themeSelector = document.createElement("button");
+themeSelector.textContent = "\u{1F3A8}";
+themeSelector.classList.add("ocat-settings-button");
+var themeSelectorTooltip = document.createElement("div");
+themeSelectorTooltip.id = "ocat-theme-tooltip";
+themeSelectorTooltip.classList.add("ocat-tooltip");
+
+themeSelector.addEventListener("click", e => {
+	document.getElementById("ocat-theme-tooltip").classList.toggle("ocat-active");
+});
+
+ocat._themes = [];
+[...document.querySelector(".right.sidebar").children].forEach(el => {
+	if(el.id.includes("-theme")) {
+		// theme button
+		var themeClass = el.id.replace(/-theme(\d*)$/, (/\bmode\b/i.test(el.textContent) ? "mode$1" : "theme$1"));
+		var themeButton = document.createElement("button");
+		ocat._themes.push(themeClass);
+		themeButton.title = el.textContent;
+		themeButton.classList.add("ocat-settings-button");
+		themeButton.classList.add(themeClass);
+		themeButton.addEventListener("click", function(e) {
+			document.body.classList.remove(...ocat._themes);
+			document.body.classList.add(themeClass);
+		});
+		themeSelectorTooltip.appendChild(themeButton);
+	}
+});
+
+settinsContainer.appendChild(themeSelector);
+settinsContainer.appendChild(themeSelectorTooltip);
+sidebar.appendChild(settinsContainer);
+document.body.appendChild(sidebar);
 
 var whitelist = {
 	'message-container': 1,
 	'ocat-message-toolbar': 1,
-	'ocat-member-list': 1
+	'ocat-sidebar': 1
 };
+// remove unknown children
 [...document.body.children].forEach(el => {
 	if(!(el.id in whitelist)
 		&& el.checkVisibility()) el.remove();
@@ -770,7 +875,7 @@ ocat._hooks.pingUsers = () => {
 		ocat._userHistory[user].online = false;
 		ocat._userHistory[user].element.classList.toggle("ocat-online", false);
 	}
-	ocat._sendJsPayload("/*ocat-user-ping-message*/socket.emit('pongUser', username);");
+	socket.emit("html-message", `<img class="ocat-user-ping-message" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAA1JREFUGFdjYGBkZAAAAAoAAx9k7/gAAAAASUVORK5CYII=" onload="socket.emit('pongUser', username);this.parentElement.remove();" style="width:0px;height:0px;"/>`);
 };
 
 ocat._hooks.updateUserData = (user, data) => {
@@ -859,7 +964,7 @@ ocat._hooks.antiXss = (msg) => {
 			if(i.name.toLowerCase().startsWith("on")
 				//javascript: url?
 				|| (/href|src/i.test(i.name) && /^(vb|java|live)script:/i.test(i.value))) {
-				if(i.value.includes("/*ocat-user-ping-message*/")) continue;
+				if(n.classList.contains("ocat-user-ping-message")) continue;
 				var id = idGenerator();
 				n.classList.add(id);
 				ocat._xssIds[id] = {
@@ -910,7 +1015,7 @@ ocat._hooks.htmlMsg = (msg) => {
 	if(namePrefix && /^(.*):\s*$/.test(namePrefix.textContent)) {
 		ocat._hooks.updateUserData(namePrefix.textContent.replace(/^(.*):\s*$/, "$1"), { active: true });
 		return sandbox.innerHTML;
-	} else if(!msg.includes("/*ocat-user-ping-message*/")) {
+	} else if(!msg.includes("ocat-user-ping-message")) {
 		ocat._hooks.pingUsers();
 	}
 	return msg;
