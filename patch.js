@@ -1,7 +1,7 @@
 if(!!ocat) throw new Error("Already Injected");
 
 var ocat = {
-	_LAST_SEEN_CCHAT_HASH: 0,
+	_LAST_SEEN_CCHAT_HASH: 1292211159,
 	_notification: new Audio(),
 	_currentNotification: null,
 	_currentBannerColor: "transparent",
