@@ -473,6 +473,10 @@ body {
 	min-width: max-content;
 }
 
+#message-container > div > img[onload*="/*ocat-user-ping-message*/"] {
+	display: none;
+}
+
 #ocat-member-list {
 	grid-area: member-list;
 	width: 20vw;
