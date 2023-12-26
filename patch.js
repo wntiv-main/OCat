@@ -358,14 +358,14 @@ body {
 	max-height: 3em;
 }
 
-.darkmode .ocat-input-container,
-.darkmode #message-input {
-	background: #252525;
+.ocat-input-container,
+#message-input {
+	background: #80808050;
 }
 
-.darkmode .ocat-input-container > input,
-.darkmode #message-input {
-	color: white;
+.ocat-input-container > input,
+#message-input {
+	color: inherit;
 }
 
 .ocat-input-container .ocat-prefix {
@@ -459,7 +459,8 @@ body {
 	min-height: 3em;
 	display: flex;
 	align-items: center;
-	padding: 0px 6px;
+	padding: 6px;
+	backdrop-filter: blur(10px);
 }
 
 #message-container {
@@ -504,6 +505,7 @@ body {
 	border-left: 1px solid #aaa;
 	display: flex;
 	flex-direction: column;
+	backdrop-filter: blur(10px);
 }
 
 #ocat-member-list {
@@ -515,7 +517,6 @@ body {
 }
 
 #ocat-settings-container {
-
 }
 
 #ocat-member-list li {
@@ -846,6 +847,7 @@ ocat._themes = [];
 		themeButton.classList.add("ocat-settings-button");
 		themeButton.classList.add(themeClass);
 		themeButton.addEventListener("click", function(e) {
+			document.getElementById("ocat-theme-tooltip").classList.toggle("ocat-active", false);
 			document.body.classList.remove(...ocat._themes);
 			document.body.classList.add(themeClass);
 		});
