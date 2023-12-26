@@ -430,6 +430,7 @@ body {
 	max-height: 50vh;
 	border: 1px solid #a0a0a0;
 	overflow-y: auto;
+	overflow-y: overlay;
 	position: static;
 	box-sizing: border-box;
 	overflow-wrap: anywhere;
