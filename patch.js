@@ -432,6 +432,7 @@ body {
 	overflow-y: auto;
 	position: static;
 	box-sizing: border-box;
+	overflow-wrap: anywhere;
 }
 
 body {
