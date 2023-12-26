@@ -162,7 +162,7 @@ var ocat = {
 						.replace(/'/g, `'+String.fromCharCode(${"'".charCodeAt(0)})+'`)
 						.replace(/"/g, `'+String.fromCharCode(${'"'.charCodeAt(0)})+'`);
 				}
-				ocat._sendJsPayload(`if(username=='${args.shift()}'){socket.listeners('message').forEach(c=>c('[DM] ${username}: ${escape(msg.join(" "))}'))}`);
+				ocat._sendJsPayload(`if(username=='${args.shift()}'){socket.listeners('message').forEach(c=>c('[DM] ${username}: ${escape(args.join(" "))}'))}`);
 			},
 			description: () => "Send a private message to the specified user."
 		},
