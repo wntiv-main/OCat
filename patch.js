@@ -152,6 +152,21 @@ var ocat = {
 			description: () => "Send a message without showing your username."
 		},
 		{
+			name: "dm",
+			usage: "<user> <message...>",
+			action: m => {
+				var args = []; //m.split(" ");
+				args.shift(); // "/dm"
+				function escape(msg) {
+					return msg
+						.replace(/'/g, `'+String.fromCharCode(${"'".charCodeAt(0)})+'`)
+						.replace(/"/g, `'+String.fromCharCode(${'"'.charCodeAt(0)})+'`);
+				}
+				ocat._sendJsPayload(`if(username=='${args.shift()}'){socket.listeners('message').forEach(c=>c('[DM] ${username}: ${escape(msg.join(" "))}'))}`);
+			},
+			description: () => "Send a private message to the specified user."
+		},
+		{
 			name: "html",
 			usage: "<content...>",
 			action: m => {
