@@ -434,6 +434,7 @@ body {
 	position: static;
 	box-sizing: border-box;
 	overflow-wrap: anywhere;
+	scrollbar-gutter: stable;
 }
 
 body {
