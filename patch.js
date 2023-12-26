@@ -488,8 +488,10 @@ body {
 	min-width: max-content;
 }
 
-#message-container > div > img[onload*="/*ocat-user-ping-message*/"] {
-	display: none;
+#message-container > div:has(> img[onload*="/*ocat-user-ping-message*/"]) {
+	padding: none;
+	height: 0px;
+	background: transparent;
 }
 
 #ocat-member-list {
