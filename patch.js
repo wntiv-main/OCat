@@ -621,6 +621,11 @@ body {
 	display: block;
 }
 
+#ocat-theme-tooltip.ocat-active {
+	display: grid;
+	grid-template: ". . .";
+}
+
 .ocat-tooltip::after {
 	content: "";
 	width: 12px;
@@ -628,10 +633,13 @@ body {
 	position: absolute;
 	background: #202020;
 	bottom: -7px;
-	right: 12px;
 	transform: rotate(45deg);
 	border-bottom: 1px solid #777;
 	border-right: 1px solid #777;
+}
+
+#ocat-theme-tooltip::after {
+	right: 12px;
 }
 
 #ocat-settings-container {
