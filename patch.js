@@ -632,7 +632,7 @@ ocat._hooks.markdown = (name, msg) => {
 			matched = true;
 			var el = document.createElement(r.element);
 			r.attr(el);
-			el.textContent = content;
+			el.innerHTML = content;
 			return el.outerHTML;
 		});
 	});
