@@ -606,12 +606,13 @@ body {
 }
 
 .ocat-tooltip {
+	--ocat-tooltip-background: #202020;
 	padding: 5px;
 	margin: 5px;
 	position: absolute;
 	transform: translateY(-100%);
 	top: -10px;
-	background: #202020;
+	background: var(--ocat-tooltip-background);
 	border: 1px solid #777;
 	border-radius: 12px;
 	z-index: 1;
@@ -634,8 +635,7 @@ body {
 	width: 12px;
 	height: 12px;
 	position: absolute;
-	background: #80808050;
-	backdrop-filter: blur(10px);
+	background: var(--ocat-tooltip-background);
 	bottom: -7px;
 	transform: rotate(45deg);
 	border-bottom: 1px solid #777;
