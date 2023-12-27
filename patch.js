@@ -390,6 +390,11 @@ body {
 	--ocat-success-color: #00bf0080;
 }
 
+.ocat-custom-background-theme {
+	background: var(--ocat-custom-background);
+	background-size: cover;
+}
+
 .minecraftthemeone,
 .minecraftthemetwo {
 	box-shadow: inset 0 0 0px 50vw #00000075;
@@ -939,6 +944,7 @@ var customThemeButton = document.createElement("input");
 customThemeButton.type = "file";
 customThemeButton.title = "Custom Background";
 customThemeButton.classList.add("ocat-settings-button");
+customThemeButton.classList.add("ocat-custom-background-theme");
 customThemeButton.id = "ocat-custom-theme-selector";
 customThemeButton.addEventListener("change", function(e) {
 	document.getElementById("ocat-theme-tooltip").classList.toggle("ocat-active", false);
