@@ -140,7 +140,7 @@ var ocat = {
 		document.body.classList.remove(...ocat._themes, "ocat-custom-background-theme");
 		if(/^custom-background\((['"])(.*)\1\)$/.test(value)) {
 			document.body.classList.add("ocat-custom-background-theme");
-			document.body.style["--ocat-custom-background"] = value.replace(/^custom-background\((['"])(.*)\1\)$/, `url($1$2$1)`);
+			document.body.style.setProperty("--ocat-custom-background", value.replace(/^custom-background\((['"])(.*)\1\)$/, `url($1$2$1)`));
 			var img = new Image();
 			img.addEventListener("load", e => {
 				if(this._isLight(e.target)) {
@@ -391,7 +391,7 @@ body {
 }
 
 .ocat-custom-background-theme {
-	background: var(--ocat-custom-background);
+	background-image: var(--ocat-custom-background);
 	background-size: cover;
 }
 
