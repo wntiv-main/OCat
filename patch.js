@@ -1,7 +1,7 @@
 if(!!ocat) throw new Error("Already Injected");
 
 var ocat = {
-	_LAST_SEEN_CCAT_HASH: 1882333753,
+	_LAST_SEEN_CCAT_HASH: -394914564,
 	_notification: new Audio(),
 	_currentNotification: null,
 	_currentBannerColor: "transparent",
@@ -848,7 +848,8 @@ ocat._themes = [];
 	if(el.id.includes("-theme")) {
 		// theme button
 		var themeClass = el.id.replace(/-theme(\d*)$/, (/\bmode\b/i.test(el.textContent) ? "mode$1" : "theme$1"))
-			.replace("udark", "ultradark");
+			.replace("udark", "ultradark")
+			.replace(/-/g, "");
 		var themeButton = document.createElement("button");
 		ocat._themes.push(themeClass);
 		themeButton.title = el.textContent;
