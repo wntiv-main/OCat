@@ -954,6 +954,10 @@ ocat._hooks.possibleConnectMessage = (m) => {
 	if(/^(.*) joined\s*the\s*chat\.?\s*$/i.test(m)) {
 		ocat._hooks.updateUserData(m.replace(/^(.*) joined\s*the\s*chat\.?\s*$/i, "$1"), { active: true });
 	}
+	if(/^(.*) left\s*the\s*chat\.?\s*$/i.test(m)) {
+		ocat._hooks.updateUserData(m.replace(/^(.*) left\s*the\s*chat\.?\s*$/i, "$1"), { online: false });
+		ocat._hooks.pingUsers();
+	}
 };
 
 function patch(channel, predicate, patcher) {
