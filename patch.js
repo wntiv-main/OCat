@@ -154,7 +154,7 @@ var ocat = {
 				const objectStore = db.createObjectStore("files", { keyPath: "hash" });
 			};
 			request.onsuccess = e => {
-				this._fileDatabase = e.target.result;
+				this._database = e.target.result;
 				this._database.onerror = this._fileError;
 				callback(this._database);
 			};
