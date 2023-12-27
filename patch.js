@@ -127,7 +127,7 @@ var ocat = {
 		}
 		(this._hooks.pingUsers || (() => { }))();
 	},
-	async computeHash(blob) {
+	async _computeHash(blob) {
 		const arrayBuffer = await new Promise((resolve, reject) => {
 			// Convert to ArrayBuffer
 			var fileReader = new FileReader();
@@ -162,7 +162,7 @@ var ocat = {
 	},
 	_addFile(blob, callback) {
 		this._getDb(db => {
-			computeHash(blob).then(hash => {
+			this._computeHash(blob).then(hash => {
 				const transaction = db.transaction(["files"], "readwrite");
 				const fileStore = transaction.objectStore("files");
 				const request = fileStore.put({
