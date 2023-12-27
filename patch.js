@@ -841,6 +841,7 @@ nameInput.addEventListener("change", e => {
 		delete ocat._userHistory[username];
 	}
 	username = e.target.value;
+	localStorage.username = username;
 	document.getElementById("message-input").focus();
 });
 nameSelector.appendChild(nameInput);
