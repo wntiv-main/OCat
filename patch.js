@@ -632,7 +632,7 @@ body {
 }
 
 .ocat-tooltip {
-	--ocat-tooltip-background: #202020;
+	--ocat-tooltip-background: #e0e0e0;
 	padding: 5px;
 	margin: 5px;
 	position: absolute;
@@ -644,6 +644,10 @@ body {
 	z-index: 1;
 	overflow: visible;
 	display: none;
+}
+
+.ocat-dark-style .ocat-tooltip {
+	--ocat-tooltip-background: #202020;
 }
 
 .ocat-tooltip.ocat-active {
