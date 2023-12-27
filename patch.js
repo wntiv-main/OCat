@@ -464,6 +464,18 @@ body {
 	box-shadow: inset 0 0 0px 50vw #00000075;
 }
 
+.ocat-dark-style .ocat-invert-dark {
+	filter: invert(100%);
+}
+
+.ocat-icon {
+	width: 100%;
+	height: 100%;
+	user-select: none;
+	pointer-events: none;
+	-webkit-user-drag: none;
+}
+
 .ocat-input-container {
 	display: flex;
 	align-items: center;
@@ -975,9 +987,6 @@ themeSelector.classList.add("ocat-settings-button");
 var themeSelectorTooltip = document.createElement("div");
 themeSelectorTooltip.id = "ocat-theme-tooltip";
 themeSelectorTooltip.classList.add("ocat-tooltip");
-// var tooltipArrow = document.createElement("div");
-// tooltipArrow.classList.add("ocat-tooltip-arrow");
-// themeSelectorTooltip.appendChild(tooltipArrow);
 
 themeSelector.addEventListener("click", e => {
 	document.getElementById("ocat-theme-tooltip").classList.toggle("ocat-active");
@@ -1021,6 +1030,11 @@ customThemeLabel.title = "Custom Background";
 customThemeLabel.classList.add("ocat-settings-button");
 customThemeLabel.classList.add("ocat-custom-background-theme");
 customThemeLabel.setAttribute("for", "ocat-custom-theme-selector");
+var customThemeIcon = document.createElement("img");
+customThemeIcon.src = "https://cdn-icons-png.flaticon.com/512/4211/4211763.png";
+customThemeIcon.classList.add("ocat-icon");
+customThemeIcon.classList.add("ocat-invert-dark");
+customThemeLabel.appendChild(customThemeIcon);
 themeSelectorTooltip.appendChild(customThemeLabel);
 themeSelectorTooltip.appendChild(customThemeButton);
 
