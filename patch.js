@@ -203,7 +203,7 @@ var ocat = {
 			this._getFile(hash, blob => {
 				if(this._themeUrl) URL.revokeObjectURL(this._themeUrl);
 				this._themeUrl = URL.createObjectURL(blob);
-				document.body.style.setProperty("--ocat-custom-background", this._themeUrl);
+				document.body.style.setProperty("--ocat-custom-background", `url("${this._themeUrl}")`);
 				var img = new Image();
 				img.addEventListener("load", e => {
 					if(this._isLight(e.target)) {
