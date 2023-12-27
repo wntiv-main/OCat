@@ -127,6 +127,65 @@ var ocat = {
 		}
 		(this._hooks.pingUsers || (() => { }))();
 	},
+	async computeHash(blob) {
+		const arrayBuffer = await new Promise((resolve, reject) => {
+			// Convert to ArrayBuffer
+			var fileReader = new FileReader();
+			fileReader.onload = () => resolve(fileReader.result);
+			fileReader.onerror = () => reject(fileReader.error);
+			fileReader.readAsArrayBuffer(blob);
+		});
+		const digest = await crypto.subtle.digest("SHA-256", arrayBuffer);
+		return String.fromCharCode.apply(null, new Uint8Array(digest));
+	},
+	_fileError(e) {
+		this._clientMessage("Could not load file");
+		if(this.devMessages) {
+			this._clientMessage(`Error: ${e.target.errorCode}`);
+		}
+	},
+	_database: null,
+	_getDb(callback) {
+		if(!this._database) {
+			var request = indexedDB.open("ocat-db", 1);
+			request.onerror = this._fileError;
+			request.onupgradeneeded = (event) => {
+				const db = event.target.result;
+				const objectStore = db.createObjectStore("files", { keyPath: "hash" });
+			};
+			request.onsuccess = e => {
+				this._fileDatabase = e.target.result;
+				this._database.onerror = this._fileError;
+				callback(this._database);
+			};
+		} else callback(this._database);
+	},
+	_addFile(blob, callback) {
+		this._getDb(db => {
+			computeHash(blob).then(hash => {
+				const transaction = db.transaction(["files"], "readwrite");
+				const fileStore = transaction.objectStore("files");
+				const request = fileStore.put({
+					hash: hash,
+					blob: blob
+				});
+				request.onsuccess = e => {
+					callback(hash);
+				};
+			});
+		});
+	},
+	_getFile(key, callback) {
+		this._getDb(db => {
+			const transaction = db.transaction(["files"], "readonly");
+			const fileStore = transaction.objectStore("files");
+			const request = fileStore.get(key);
+			request.onsuccess = e => {
+				callback(e.target.result.name);
+			};
+		});
+	},
+	_themeUrl: null,
 	_theme: "darkmode",
 	get theme() {
 		return this._theme;
@@ -140,17 +199,22 @@ var ocat = {
 		document.body.classList.remove(...ocat._themes, "ocat-custom-background-theme");
 		if(/^custom-background\((['"])(.*)\1\)$/.test(value)) {
 			document.body.classList.add("ocat-custom-background-theme");
-			document.body.style.setProperty("--ocat-custom-background", value.replace(/^custom-background\((['"])(.*)\1\)$/, `url($1$2$1)`));
-			var img = new Image();
-			img.addEventListener("load", e => {
-				if(this._isLight(e.target)) {
-					// light background, light mode
-					document.body.classList.remove("ocat-dark-style");
-				} else {
-					document.body.classList.add("ocat-dark-style");
-				}
+			var hash = value.replace(/^custom-background\((['"])(.*)\1\)$/, `$2`);
+			this._getFile(hash, blob => {
+				if(this._themeUrl) URL.revokeObjectURL(this._themeUrl);
+				this._themeUrl = URL.createObjectURL(blob);
+				document.body.style.setProperty("--ocat-custom-background", this._themeUrl);
+				var img = new Image();
+				img.addEventListener("load", e => {
+					if(this._isLight(e.target)) {
+						// light background, light mode
+						document.body.classList.remove("ocat-dark-style");
+					} else {
+						document.body.classList.add("ocat-dark-style");
+					}
+				});
+				img.src = this._themeUrl;
 			});
-			img.src = value.replace(/^custom-background\((['"])(.*)\1\)$/, `$2`);
 		} else {
 			document.body.classList.add(value);
 			if(this._isLight(window.getComputedStyle(document.body).color)) {
@@ -942,19 +1006,22 @@ ocat._themes = [];
 
 var customThemeButton = document.createElement("input");
 customThemeButton.type = "file";
-customThemeButton.title = "Custom Background";
-customThemeButton.classList.add("ocat-settings-button");
-customThemeButton.classList.add("ocat-custom-background-theme");
+customThemeButton.style.display = "none";
 customThemeButton.id = "ocat-custom-theme-selector";
 customThemeButton.addEventListener("change", function(e) {
 	document.getElementById("ocat-theme-tooltip").classList.toggle("ocat-active", false);
-	var f = new FileReader();
-	f.addEventListener("load", e => {
-		ocat.theme = `custom-background("${f.result}")`;
+	if(!this.files.length) return;
+	ocat._addFile(this.files[0], hash => {
+		ocat.theme = `custom-background("${hash}")`;
 		ocat._saveSettings();
 	});
-	f.readAsDataURL(this.files[0]);
 });
+var customThemeLabel = document.createElement("label");
+customThemeLabel.title = "Custom Background";
+customThemeLabel.classList.add("ocat-settings-button");
+customThemeLabel.classList.add("ocat-custom-background-theme");
+customThemeLabel.setAttribute("for", "ocat-custom-theme-selector");
+themeSelectorTooltip.appendChild(customThemeLabel);
 themeSelectorTooltip.appendChild(customThemeButton);
 
 settinsContainer.appendChild(themeSelector);
