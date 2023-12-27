@@ -818,7 +818,7 @@ messageToolbar.appendChild(messageContainer);
 
 var nameSelector = document.createElement("label");
 nameSelector.classList.add("ocat-input-container");
-nameSelector.classList.add("ocat-name-selector");
+nameSelector.id = "ocat-name-selector-container";
 nameSelector.setAttribute("for", "ocat-name-selector");
 
 var namePrefix = document.createElement("span");
@@ -826,22 +826,28 @@ namePrefix.textContent = "@";
 namePrefix.classList.add("ocat-prefix");
 nameSelector.appendChild(namePrefix);
 
-var nameInput = document.createElement("input");
-nameInput.type = "text";
-nameInput.value = username;
+var nameInput = document.getElementById("name-selector");
+if(!nameInput) {
+	nameInput = document.createElement("input");
+	nameInput.value = username;
+	nameInput.addEventListener("change", e => {
+		username = e.target.value;
+		localStorage.username = username;
+	});
+}
+ocat._oldUsername = username;
 nameInput.id = "ocat-name-selector";
 nameInput.setAttribute("spellcheck", false);
 nameInput.addEventListener("change", e => {
-	if(username in ocat._userHistory) {
-		ocat._userHistory[username].element.remove();
+	if(ocat._oldUsername in ocat._userHistory) {
+		ocat._userHistory[ocat._oldUsername].element.remove();
 		ocat._hooks.updateUserData(e.target.value, {
 			active: true,
-			online: ocat._userHistory[username].online,
+			online: ocat._userHistory[ocat._oldUsername].online,
 		});
-		delete ocat._userHistory[username];
+		delete ocat._userHistory[ocat._oldUsername];
 	}
-	username = e.target.value;
-	localStorage.username = username;
+	ocat._oldUsername = username;
 	document.getElementById("message-input").focus();
 });
 nameSelector.appendChild(nameInput);
