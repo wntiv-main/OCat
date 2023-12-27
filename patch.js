@@ -44,6 +44,19 @@ var ocat = {
 			}, maxTime);
 		}
 	},
+	_canvas: new OffscreenCanvas(1, 1).getContext('2d'),
+	_parseCSSColor(color) {
+		this._canvas.fillStyle = color;
+		this._canvas.fillRect(0, 0, 1, 1);
+		const imgd = this._canvas.getImageData(0, 0, 1, 1);
+		this._canvas.clearRect(0, 0, 1, 1);
+		return imgd.data;
+	},
+	_isLight(color) {
+		var [r, g, b, a] = this._parseCSSColor(color);
+		var luma = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+		return luma > 128;
+	},
 	_notify(msg, type, el) {
 		if(document.hasFocus() || document.visibilityState == "visible") return;
 		if(msg.includes("ocat-user-ping-message")) return;
@@ -108,6 +121,12 @@ var ocat = {
 		this._theme = value;
 		document.body.classList.remove(...ocat._themes);
 		document.body.classList.add(value);
+		if(this._isLight(window.getComputedStyle(document.body).color)) {
+			// Light text, dark mode
+			document.body.classList.add("ocat-dark-style");
+		} else {
+			document.body.classList.remove("ocat-dark-style");
+		}
 	},
 	_notificationSound: "",
 	get notificationSound() {
@@ -330,9 +349,15 @@ body {
 
 .darkmode {
 	background: #1e1e1e;
-	color: white;
+}
+
+.ocat-dark-style {
 	--ocat-error-color: #bf000080;
 	--ocat-success-color: #00bf0080;
+}
+
+.minecraftthemetwo {
+	box-shadow: inset 0 0 0px 50vw #00000075;
 }
 
 .ocat-input-container {
@@ -601,7 +626,7 @@ body {
 	color: blue;
 }
 
-.darkmode .ocat-link {
+.ocat-dark-style .ocat-link {
 	color: #00c0ff;
 }
 
