@@ -620,7 +620,6 @@ body {
 	display: none;
 }
 
-
 .ocat-tooltip.ocat-active {
 	display: block;
 }
@@ -630,7 +629,7 @@ body {
 	grid-template: ". . .";
 }
 
-.ocat-tooltip::after {
+.ocat-tooltip .ocat-tooltip-arrow {
 	content: "";
 	width: 12px;
 	height: 12px;
@@ -836,6 +835,8 @@ themeSelector.classList.add("ocat-settings-button");
 var themeSelectorTooltip = document.createElement("div");
 themeSelectorTooltip.id = "ocat-theme-tooltip";
 themeSelectorTooltip.classList.add("ocat-tooltip");
+var tooltipArrow = document.createElement("div");
+tooltipArrow.classList.add("ocat-tooltip-arrow");
 
 themeSelector.addEventListener("click", e => {
 	document.getElementById("ocat-theme-tooltip").classList.toggle("ocat-active");
@@ -1069,7 +1070,8 @@ patch("html-message",
 });
 
 socket.on("pongUser", user => {
-	ocat._hooks.updateUserData(user, { online: true });
+	if(user)
+		ocat._hooks.updateUserData(user, { online: true });
 });
 
 // Load settings
