@@ -356,6 +356,7 @@ body {
 	--ocat-success-color: #00bf0080;
 }
 
+.minecraftthemeone,
 .minecraftthemetwo {
 	box-shadow: inset 0 0 0px 50vw #00000075;
 }
