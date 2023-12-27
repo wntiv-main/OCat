@@ -181,7 +181,7 @@ var ocat = {
 			const fileStore = transaction.objectStore("files");
 			const request = fileStore.get(key);
 			request.onsuccess = e => {
-				callback(e.target.result.name);
+				callback(e.target.result.blob);
 			};
 		});
 	},
