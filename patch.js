@@ -629,7 +629,7 @@ body {
 	grid-template: ". . .";
 }
 
-.ocat-tooltip .ocat-tooltip-arrow {
+.ocat-tooltip::after {
 	content: "";
 	width: 12px;
 	height: 12px;
@@ -641,7 +641,7 @@ body {
 	border-right: 1px solid #777;
 }
 
-#ocat-theme-tooltip .ocat-tooltip-arrow {
+#ocat-theme-tooltip::after {
 	right: 12px;
 }
 
@@ -835,9 +835,9 @@ themeSelector.classList.add("ocat-settings-button");
 var themeSelectorTooltip = document.createElement("div");
 themeSelectorTooltip.id = "ocat-theme-tooltip";
 themeSelectorTooltip.classList.add("ocat-tooltip");
-var tooltipArrow = document.createElement("div");
-tooltipArrow.classList.add("ocat-tooltip-arrow");
-themeSelectorTooltip.appendChild(tooltipArrow);
+// var tooltipArrow = document.createElement("div");
+// tooltipArrow.classList.add("ocat-tooltip-arrow");
+// themeSelectorTooltip.appendChild(tooltipArrow);
 
 themeSelector.addEventListener("click", e => {
 	document.getElementById("ocat-theme-tooltip").classList.toggle("ocat-active");
