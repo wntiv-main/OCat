@@ -641,7 +641,7 @@ body {
 	border-right: 1px solid #777;
 }
 
-#ocat-theme-tooltip::after {
+#ocat-theme-tooltip .ocat-tooltip-arrow {
 	right: 12px;
 }
 
@@ -837,6 +837,7 @@ themeSelectorTooltip.id = "ocat-theme-tooltip";
 themeSelectorTooltip.classList.add("ocat-tooltip");
 var tooltipArrow = document.createElement("div");
 tooltipArrow.classList.add("ocat-tooltip-arrow");
+themeSelectorTooltip.appendChild(tooltipArrow);
 
 themeSelector.addEventListener("click", e => {
 	document.getElementById("ocat-theme-tooltip").classList.toggle("ocat-active");
