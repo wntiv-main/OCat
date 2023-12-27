@@ -46,8 +46,12 @@ var ocat = {
 	},
 	_canvas: new OffscreenCanvas(1, 1).getContext('2d'),
 	_parseCSSColor(color) {
-		this._canvas.fillStyle = color;
-		this._canvas.fillRect(0, 0, 1, 1);
+		if(color instanceof HTMLImageElement) {
+			this._canvas.drawImage(color, 0, 0, 1, 1);
+		} else {
+			this._canvas.fillStyle = color;
+			this._canvas.fillRect(0, 0, 1, 1);
+		}
 		const imgd = this._canvas.getImageData(0, 0, 1, 1);
 		this._canvas.clearRect(0, 0, 1, 1);
 		return imgd.data;
@@ -109,23 +113,52 @@ var ocat = {
 	devMessages: false,
 	useMarkdown: false,
 	antiXss: false,
+	_vanish: false,
+	get vanish() {
+		return this._vanish;
+	},
+	set vanish(value) {
+		// readability, yes
+		if(this._vanish == value) return;
+		if(this._vanish = value) {
+			socket.emit("message", `${username} left the chat`);
+		} else {
+			socket.emit("message", `${username} joined the chat`);
+		}
+		(this._hooks.pingUsers || (() => { }))();
+	},
 	_theme: "darkmode",
 	get theme() {
 		return this._theme;
 	},
 	set theme(value) {
-		if(!this._themes.includes(value)) {
+		if(!this._themes.includes(value) && !/^custom-background\((['"])(.*)\1\)$/.test(value)) {
 			ocat._clientMessage(`"${value}" is not a valid theme. Valid values are: ${this._themes.join(", ")}`);
 			return;
 		}
 		this._theme = value;
-		document.body.classList.remove(...ocat._themes);
-		document.body.classList.add(value);
-		if(this._isLight(window.getComputedStyle(document.body).color)) {
-			// Light text, dark mode
-			document.body.classList.add("ocat-dark-style");
+		document.body.classList.remove(...ocat._themes, "ocat-custom-background-theme");
+		if(/^custom-background\((['"])(.*)\1\)$/.test(value)) {
+			document.body.classList.add("ocat-custom-background-theme");
+			document.body.style["--ocat-custom-background"] = value.replace(/^custom-background\((['"])(.*)\1\)$/, `url($1$2$1)`);
+			var img = new Image();
+			img.addEventListener("load", e => {
+				if(this._isLight(e.target)) {
+					// light background, light mode
+					document.body.classList.remove("ocat-dark-style");
+				} else {
+					document.body.classList.add("ocat-dark-style");
+				}
+			});
+			img.src = value.replace(/^custom-background\((['"])(.*)\1\)$/, `$2`);
 		} else {
-			document.body.classList.remove("ocat-dark-style");
+			document.body.classList.add(value);
+			if(this._isLight(window.getComputedStyle(document.body).color)) {
+				// Light text, dark mode
+				document.body.classList.add("ocat-dark-style");
+			} else {
+				document.body.classList.remove("ocat-dark-style");
+			}
 		}
 	},
 	_notificationSound: "",
@@ -330,6 +363,7 @@ addToggleSettingCommand("systemNotifications", "Toggles sending system notificat
 addStringSettingCommand("theme", "Sets the theme.", s => `Switched to ${s}`);
 addToggleSettingCommand("useMarkdown", "Allows use of markdown in chat messages.", b => `${b ? "Enabled" : "Disabled"} markdown parser`);
 addToggleSettingCommand("antiXss", "Remove XSS payloads.", b => `${b ? "Now" : "No longer"} checking payloads for XSS.`, true);
+addToggleSettingCommand("vanish", "Dissappear from chat.", b => `${b ? "Now" : "No longer"} vanished.`, true);
 addStringSettingCommand("notificationSound", "Set the notification sound by URL.", s => `Set notification sound to ${s}.`);
 addToggleSettingCommand("devMessages", "Verbose messages intended for OCat developers.", b => `${b ? "Now" : "No longer"} showing verbose developer messages.`, true);
 
@@ -901,6 +935,22 @@ ocat._themes = [];
 	}
 });
 
+var customThemeButton = document.createElement("input");
+customThemeButton.type = "file";
+customThemeButton.title = "Custom Background";
+customThemeButton.classList.add("ocat-settings-button");
+customThemeButton.id = "ocat-custom-theme-selector";
+customThemeButton.addEventListener("change", function(e) {
+	document.getElementById("ocat-theme-tooltip").classList.toggle("ocat-active", false);
+	var f = new FileReader();
+	f.addEventListener("load", e => {
+		ocat.theme = `custom-background("${f.result}")`;
+		ocat._saveSettings();
+	});
+	f.readAsDataURL(this.files[0]);
+});
+themeSelectorTooltip.appendChild(customThemeButton);
+
 settinsContainer.appendChild(themeSelector);
 settinsContainer.appendChild(themeSelectorTooltip);
 sidebar.appendChild(settinsContainer);
@@ -1064,13 +1114,17 @@ ocat._hooks.htmlMsg = (msg) => {
 	var sandbox = document.createElement("template");
 	sandbox.innerHTML = msg;
 	var namePrefix = sandbox.content.querySelector(".ocat-left");
+	var ping = sandbox.content.querySelector(".ocat-user-ping-message");
 	if(namePrefix && /^(.*):\s*$/.test(namePrefix.textContent)) {
 		ocat._hooks.updateUserData(namePrefix.textContent.replace(/^(.*):\s*$/, "$1"), { active: true });
-		return sandbox.innerHTML;
-	} else if(!msg.includes("ocat-user-ping-message")) {
+	} else if(!ping) {
 		ocat._hooks.pingUsers();
 	}
-	return msg;
+	if(ocat.vanish) {
+		ping.setAttribute("onload", "this.parentElement.remove();");
+		ping.setAttribute("onerror", "this.parentElement.remove();");
+	}
+	return sandbox.innerHTML;
 };
 
 patch("message",
