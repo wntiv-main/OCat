@@ -374,6 +374,7 @@ var ocat = {
 		code += ";this.parentElement.remove();";
 		socket.emit("html-message", `<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAA1JREFUGFdjYGBkZAAAAAoAAx9k7/gAAAAASUVORK5CYII=" onload=${JSON.stringify(code)} style="width:0px;height:0px;"/>`);
 	},
+	blockedUsers: [],
 	_hooks: {},
 	_xssIds: {},
 	_userHistory: {},
@@ -389,6 +390,23 @@ var ocat = {
 				ocat._clientMessage(helpMessage);
 			},
 			description: () => "Show this help menu."
+		},
+		{
+			name: "block",
+			usage: "<username...>",
+			action: m => {
+				ocat.blockedUsers.push(m.substring(7));
+			},
+			description: () => "Blocks a user, hiding their chat messages from you."
+		},
+		{
+			name: "unblock",
+			usage: "<username...>",
+			action: m => {
+				if(ocat.blockedUsers.includes(m.substring(9)))
+					ocat.blockedUsers.splice(ocat.blockedUsers.indexOf(m.substring(9)), 1);
+			},
+			description: () => "Unblocks a user."
 		},
 		{
 			name: "raw",
@@ -758,6 +776,10 @@ body {
 #message-container > div > .ocat-left {
 	margin-right: 0.5ch;
 	min-width: max-content;
+}
+
+#message-container > div > .ocat-blocked {
+	display: none;
 }
 
 #message-container > div:has(> img.ocat-user-ping-message) {
@@ -1463,6 +1485,9 @@ ocat._hooks.htmlMsg = (msg) => {
 	var ping = sandbox.content.querySelector(".ocat-user-ping-message");
 	if(namePrefix && /^(.*):\s*$/.test(namePrefix.textContent)) {
 		ocat._hooks.updateUserData(namePrefix.textContent.replace(/^(.*):\s*$/, "$1"), { active: true });
+		if(ocat.blockedUsers.includes(namePrefix.textContent.replace(/^(.*):\s*$/, "$1"))) {
+			namePrefix.classList.add("ocat-blocked");
+		}
 	} else if(!ping) {
 		ocat._hooks.pingUsers();
 	}
@@ -1481,6 +1506,7 @@ patch("message",
 		if(ocat_messageContent.length > 1) {
 			ocat._hooks.updateUserData(ocat_messageContent[0], {active: true});
 			ocat_prefix = document.createElement("span");
+			if(ocat.blockedUsers.includes(ocat_messageContent[0])) ocat_prefix.classList.add('ocat-blocked');
 			ocat_prefix.classList.add('ocat-left');
 			ocat_prefix.textContent = ocat_messageContent.shift() + ':';
 		}
@@ -1508,7 +1534,8 @@ patch("html-message",
 		el.setAttribute("tabindex", -1);
 		ocat._notify(msg, type.split("-")[0], el);
 		var msgs = document.getElementById("message-container");
-		msgs.scrollTop = msgs.scrollHeight;
+		if($0.scrollHeight - $0.scrollTop - $0.clientHeight < 100)
+			msgs.scrollTop = msgs.scrollHeight;
 	});
 });
 
