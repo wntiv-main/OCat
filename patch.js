@@ -1219,14 +1219,14 @@ const ocat_themeMap = {
 [...document.querySelector(".right.sidebar").children].forEach(el => {
 	if(el.id.includes("-theme")) {
 		// theme button
-		var themeClass = el.id.replace(/-theme(\d*)$/, (/\b\w*mode\b/i.test(el.className) ? "mode$1" : "theme$1"))
+		var themeClass = el.id.replace(/-theme(\d*)$/, (/\b\w*mode\d*\b/i.test(el.className) ? "mode$1" : "theme$1"))
 			.replace("udark", "ultradark")
 			.replace(/-/g, "");
 		var themeButton = document.createElement("button");
 		ocat._themes.push(themeClass);
 		themeButton.title = ocat_themeMap[el.id]
 			|| el.id.replace(/-/g, " ")
-				.replace("theme", (/\b\w*mode\b/i.test(el.className) ? "mode" : "theme"))
+			.replace("theme", (/\b\w*mode\d*\b/i.test(el.className) ? "mode" : "theme"))
 				.replace(/\b\w/g, ch => ch.toUpperCase());
 		themeButton.classList.add("ocat-settings-button");
 		themeButton.classList.add("ocat-theme-button");
