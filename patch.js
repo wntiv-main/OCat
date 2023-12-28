@@ -47,6 +47,7 @@ var ocat = {
 	_canvas: new OffscreenCanvas(1, 1).getContext('2d'),
 	_parseCSSColor(color) {
 		if(color instanceof HTMLImageElement) {
+			this._canvas.imageSmoothingEnabled = true;
 			this._canvas.drawImage(color, 0, 0, 1, 1);
 		} else {
 			this._canvas.fillStyle = color;
@@ -461,10 +462,12 @@ body {
 	background-image: var(--ocat-custom-background);
 	background-size: cover;
 	box-shadow: inset 0 0 0px 50vw #ffffff75;
+	color: black;
 }
 
 .ocat-dark-style .ocat-custom-background-theme {
 	box-shadow: inset 0 0 0px 50vw #00000075;
+	color: white;
 }
 
 .minecraftthemeone,
