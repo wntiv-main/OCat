@@ -59,7 +59,10 @@ var ocat = {
 	_isLight(color) {
 		var [r, g, b, a] = this._parseCSSColor(color);
 		var luma = 0.2126 * r + 0.7152 * g + 0.0722 * b;
-		return luma > 128;
+		if(color instanceof HTMLImageElement) {
+			return luma > 191;
+		}
+		return luma > 127;
 	},
 	_notify(msg, type, el) {
 		if(document.hasFocus() || document.visibilityState == "visible") return;
