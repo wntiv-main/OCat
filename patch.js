@@ -1024,7 +1024,7 @@ customThemeButton.addEventListener("change", function(e) {
 var customThemeLabel = document.createElement("label");
 customThemeLabel.title = "Custom Background";
 customThemeLabel.classList.add("ocat-settings-button");
-customThemeLavel.id = "ocat-custom-theme-label";
+customThemeLabel.id = "ocat-custom-theme-label";
 customThemeLabel.classList.add("ocat-custom-background-theme");
 customThemeLabel.setAttribute("for", "ocat-custom-theme-selector");
 themeSelectorTooltip.appendChild(customThemeLabel);
