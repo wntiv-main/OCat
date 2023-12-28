@@ -1216,7 +1216,7 @@ ocat._themes = [];
 [...document.querySelector(".right.sidebar").children].forEach(el => {
 	if(el.id.includes("-theme")) {
 		// theme button
-		var themeClass = el.id.replace(/-theme(\d*)$/, (/\b\w*mode\b/i.test(el.classlist) ? "mode$1" : "theme$1"))
+		var themeClass = el.id.replace(/-theme(\d*)$/, (/\b\w*mode\b/i.test(el.className) ? "mode$1" : "theme$1"))
 			.replace("udark", "ultradark")
 			.replace(/-/g, "");
 		var themeButton = document.createElement("button");
