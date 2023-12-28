@@ -1132,6 +1132,17 @@ ocat._themes = [];
 	}
 });
 
+var randomThemeButton = document.createElement("button");
+randomThemeButton.textContent = "\u{1F3B2}";
+randomThemeButton.title = "Random Theme";
+randomThemeButton.classList.add("ocat-settings-button");
+randomThemeButton.id = "ocat-random-theme-button";
+randomThemeButton.addEventListener("click", function(e) {
+	var buttons = [...e.target.parentElement.querySelectorAll(":scope button.ocat-settings-button")];
+	buttons[Math.floor(Math.random() * buttons.length)].click();
+});
+themeSelectorTooltip.appendChild(randomThemeButton);
+
 var customThemeButton = document.createElement("input");
 customThemeButton.type = "file";
 customThemeButton.setAttribute("multiple", true);
