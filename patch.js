@@ -849,9 +849,11 @@ body {
 	display: block;
 }
 
-#ocat-theme-tooltip.ocat-active {
+#ocat-theme-tooltip .ocat-grid {
 	display: grid;
 	grid-template: ". . .";
+	overflow-y: auto;
+	max-height: 50vh;
 }
 
 .ocat-tooltip::after {
@@ -1084,9 +1086,11 @@ settinsContainer.id = "ocat-settings-container";
 var themeSelector = document.createElement("button");
 themeSelector.textContent = "\u{1F3A8}";
 themeSelector.classList.add("ocat-settings-button");
+var themeSelectorTooltipContainer = document.createElement("div");
+themeSelectorTooltipContainer.id = "ocat-theme-tooltip";
+themeSelectorTooltipContainer.classList.add("ocat-tooltip");
 var themeSelectorTooltip = document.createElement("div");
-themeSelectorTooltip.id = "ocat-theme-tooltip";
-themeSelectorTooltip.classList.add("ocat-tooltip");
+themeSelectorTooltip.classList.add("ocat-grid");
 
 themeSelector.addEventListener("click", e => {
 	document.getElementById("ocat-theme-tooltip").classList.toggle("ocat-active");
@@ -1173,7 +1177,8 @@ ocat._forAllFiles(file => {
 });
 
 settinsContainer.appendChild(themeSelector);
-settinsContainer.appendChild(themeSelectorTooltip);
+themeSelectorTooltipContainer.appendChild(themeSelectorTooltip);
+settinsContainer.appendChild(themeSelectorTooltipContainer);
 sidebar.appendChild(settinsContainer);
 document.body.appendChild(sidebar);
 
