@@ -186,6 +186,9 @@ var ocat = {
 			};
 			request.onsuccess = e => {
 				this._database = e.target.result;
+				if(!this._database.objectStoreNames.contains("files")) {
+					this._database.createObjectStore("files", { keyPath: "hash" });
+				}
 				this._database.onversionchange = e => {
 					e.target.close();
 					this._clientMessage("A new version of this page is ready. Please reload or close this tab!");
