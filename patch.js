@@ -328,6 +328,7 @@ var ocat = {
 		});
 		button.style.backgroundImage = `url("${iconUrl}")`;
 		button.addEventListener("click", function(e) {
+			e.stopPropagation();
 			if(e.shiftKey) {
 				e.preventDefault();
 				ocat._removeFile(hash);
@@ -338,8 +339,6 @@ var ocat = {
 				ocat.theme = `custom-background("${hash}")`;
 				ocat._saveSettings();
 			}
-		}, {
-			capture: true
 		});
 		this._customThemeButton.parentElement.insertBefore(button, this._customThemeButton);
 	},
@@ -1161,9 +1160,8 @@ var themeSelectorTooltip = document.createElement("div");
 themeSelectorTooltip.classList.add("ocat-grid");
 
 themeSelector.addEventListener("click", e => {
+	e.stopPropagation();
 	document.getElementById("ocat-theme-tooltip").classList.toggle("ocat-active");
-}, {
-	capture: true
 });
 
 ocat._themes = [];
@@ -1253,11 +1251,10 @@ randomThemeButton.title = "Random Theme";
 randomThemeButton.classList.add("ocat-settings-button");
 randomThemeButton.id = "ocat-random-theme-button";
 randomThemeButton.addEventListener("click", function(e) {
+	e.stopPropagation();
 	var buttons = [...e.target.parentElement.querySelectorAll(":scope .ocat-theme-button")];
 	buttons[Math.floor(Math.random() * buttons.length)].click();
-}, {
-	capture: true
-});
+}});
 themeSelectorTooltip.appendChild(randomThemeButton);
 
 ocat._forAllFiles(file => {
