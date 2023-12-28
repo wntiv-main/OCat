@@ -1,7 +1,7 @@
 if(!!ocat) throw new Error("Already Injected");
 
 var ocat = {
-	_LAST_SEEN_CCAT_HASH: 993083606,
+	_LAST_SEEN_CCAT_HASH: 1002144698,
 	_notification: new Audio(),
 	_currentNotification: null,
 	_currentBannerColor: "transparent",
@@ -1235,7 +1235,7 @@ ocat._hooks.pingUsers = () => {
 
 ocat._hooks.updateUserData = (user, data) => {
 	if(!(user in ocat._userHistory)) {
-		if(user.startsWith("[DM] ") || user.startsWith("[OCat] ")) return;
+		if(user.startsWith("[DM] ") || user.startsWith("[OCat]") || user == "Help") return;
 		var el = document.createElement("li");
 		el.textContent = user;
 		ocat._userHistory[user] = {
