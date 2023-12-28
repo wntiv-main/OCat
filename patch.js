@@ -877,6 +877,7 @@ body {
 }
 
 .ocat-settings-button {
+	font-size: 1em;
 	padding: 8px;
 	min-width: 1em;
 	min-height: 1em;
