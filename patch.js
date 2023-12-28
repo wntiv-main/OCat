@@ -255,7 +255,7 @@ var ocat = {
 		});
 	},
 	_themeUrl: null,
-	_theme: "darkmode",
+	_theme: "darktheme",
 	get theme() {
 		return this._theme;
 	},
@@ -1216,7 +1216,7 @@ ocat._themes = [];
 [...document.querySelector(".right.sidebar").children].forEach(el => {
 	if(el.id.includes("-theme")) {
 		// theme button
-		var themeClass = el.id.replace(/-theme(\d*)$/, (/\bmode\b/i.test(el.textContent) ? "mode$1" : "theme$1"))
+		var themeClass = el.id.replace(/-theme(\d*)$/, "theme$1")
 			.replace("udark", "ultradark")
 			.replace(/-/g, "");
 		var themeButton = document.createElement("button");
@@ -1534,7 +1534,7 @@ patch("html-message",
 		el.setAttribute("tabindex", -1);
 		ocat._notify(msg, type.split("-")[0], el);
 		var msgs = document.getElementById("message-container");
-		if($0.scrollHeight - $0.scrollTop - $0.clientHeight < 100)
+		if(msgs.scrollHeight - msgs.scrollTop - msgs.clientHeight < 100)
 			msgs.scrollTop = msgs.scrollHeight;
 	});
 });
