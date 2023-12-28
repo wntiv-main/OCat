@@ -63,7 +63,7 @@ var ocat = {
 		var [r, g, b, a] = this._parseCSSColor(color);
 		var luma = 0.2126 * r + 0.7152 * g + 0.0722 * b;
 		if(color instanceof HTMLImageElement) {
-			return luma > 191;
+			return luma > 159;
 		}
 		return luma > 127;
 	},
