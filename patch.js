@@ -929,6 +929,11 @@ body {
 	right: 12px;
 }
 
+.ocat-theme-tooltip {
+	width: 200px;
+	height: 100px;
+}
+
 #ocat-settings-container {
 	display: flex;
 	flex-direction: row-reverse;
