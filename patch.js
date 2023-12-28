@@ -1213,6 +1213,9 @@ themeSelector.addEventListener("click", e => {
 });
 
 ocat._themes = [];
+const ocat_themeMap = {
+	"udark-theme": "Ultra Dark Mode",
+};
 [...document.querySelector(".right.sidebar").children].forEach(el => {
 	if(el.id.includes("-theme")) {
 		// theme button
@@ -1221,7 +1224,10 @@ ocat._themes = [];
 			.replace(/-/g, "");
 		var themeButton = document.createElement("button");
 		ocat._themes.push(themeClass);
-		themeButton.title = el.textContent;
+		themeButton.title = ocat_themeMap[el.id]
+			|| el.id.replace(/-/g, " ")
+				.replace("theme", (/\b\w*mode\b/i.test(el.className) ? "mode" : "theme"))
+				.replace(/\b\w/g, ch => ch.toUpperCase());
 		themeButton.classList.add("ocat-settings-button");
 		themeButton.classList.add("ocat-theme-button");
 		themeButton.classList.add(themeClass);
