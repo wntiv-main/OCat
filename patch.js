@@ -895,6 +895,8 @@ body {
 
 .ocat-settings-button {
 	font-size: 1em;
+	text-align: center;
+	line-height: 1em;
 	padding: 8px;
 	min-width: 1em;
 	min-height: 1em;
@@ -920,6 +922,10 @@ body {
 
 .ocat-shifting .ocat-theme-button-removable {
 	border: 1px solid red;
+}
+
+#ocat-random-theme-button {
+	padding: 9px 10px 7px 6px;
 }
 
 #ocat-custom-theme-label::after {
@@ -1132,17 +1138,6 @@ ocat._themes = [];
 	}
 });
 
-var randomThemeButton = document.createElement("button");
-randomThemeButton.textContent = "\u{1F3B2}";
-randomThemeButton.title = "Random Theme";
-randomThemeButton.classList.add("ocat-settings-button");
-randomThemeButton.id = "ocat-random-theme-button";
-randomThemeButton.addEventListener("click", function(e) {
-	var buttons = [...e.target.parentElement.querySelectorAll(":scope button.ocat-settings-button")];
-	buttons[Math.floor(Math.random() * buttons.length)].click();
-});
-themeSelectorTooltip.appendChild(randomThemeButton);
-
 var customThemeButton = document.createElement("input");
 customThemeButton.type = "file";
 customThemeButton.setAttribute("multiple", true);
@@ -1197,6 +1192,16 @@ customThemeLabel.setAttribute("for", "ocat-custom-theme-selector");
 ocat._customThemeButton = customThemeLabel;
 themeSelectorTooltip.appendChild(customThemeLabel);
 themeSelectorTooltip.appendChild(customThemeButton);
+
+var randomThemeButton = document.createElement("button");
+randomThemeButton.title = "Random Theme";
+randomThemeButton.classList.add("ocat-settings-button");
+randomThemeButton.id = "ocat-random-theme-button";
+randomThemeButton.addEventListener("click", function(e) {
+	var buttons = [...e.target.parentElement.querySelectorAll(":scope button.ocat-settings-button")];
+	buttons[Math.floor(Math.random() * buttons.length)].click();
+});
+themeSelectorTooltip.appendChild(randomThemeButton);
 
 ocat._forAllFiles(file => {
 	ocat._addThemeButton(file.hash, file.icon);
