@@ -472,6 +472,7 @@ body {
 
 .ocat-custom-background-theme {
 	background-image: var(--ocat-custom-background);
+	background-position: center;
 	background-size: cover;
 	box-shadow: inset 0 0 0px 50vw #ffffff75;
 	color: black;
