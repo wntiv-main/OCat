@@ -92,7 +92,7 @@ var ocat = {
 		this._notification.play();
 	},
 	_clientMessage(msg) {
-		socket.listeners("message").forEach(c => c("[OCat] " + msg));
+		socket.listeners("message").forEach(c => c("[OCat]: " + msg));
 	},
 	_systemNotifications: false,
 	get systemNotifications() {
