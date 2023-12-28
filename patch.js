@@ -856,7 +856,7 @@ body {
 #ocat-theme-tooltip .ocat-grid {
 	display: grid;
 	grid-auto-flow: column;
-	grid-template-columns: repeat(auto-fill, calc(1em + 18px));
+	grid-template-columns: repeat(auto-fit, calc(1em + 18px));
 	grid-template-rows: repeat(4, 1fr);
 	grid-gap: 10px 10px;
 	max-width: 50vw;
