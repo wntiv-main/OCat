@@ -299,7 +299,16 @@ var ocat = {
 		tooltip.classList.add("ocat-tooltip");
 		tooltip.classList.add("ocat-theme-tooltip");
 		el.addEventListener("mouseenter", function(e) {
+			tooltip.style.setProperty("--ocat-tooltip-shift", "0px");
 			tooltip.classList.add("ocat-active");
+			var rect = tooltip.getBoundingClientRect();
+			var shift = 0;
+			if(rect.right + 5 > window.innerWidth) {
+				shift = window.innerWidth - rect.right - 5;
+			} else if(rect.left < 5) {
+				shift = 5 - rect.left;
+			}
+			tooltip.style.setProperty("--ocat-tooltip-shift", `${shift}px`);
 			open(tooltip);
 		});
 		el.addEventListener("mouseleave", function(e) {
@@ -929,8 +938,16 @@ body {
 }
 
 .ocat-theme-tooltip {
-	width: 200px;
-	height: 100px;
+	--ocat-tooltip-shift: 0px;
+	width: 400px;
+	height: 250px;
+	transform: translate(calc(-50% + var(--ocat-tooltip-shift)), calc(-100% - 32px));
+	top: unset;
+}
+
+.ocat-theme-tooltip::after {
+	background: linear-gradient(315deg, var(--ocat-tooltip-background) 50%, transparent 50%);
+	transform: translateX(calc(-2px - var(--ocat-tooltip-shift))) rotate(45deg);
 }
 
 #ocat-settings-container {
