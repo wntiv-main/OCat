@@ -307,7 +307,7 @@ var ocat = {
 			close(tooltip);
 		});
 		el.appendChild(tooltip);
-		return el;
+		return tooltip;
 	},
 	_hoveredUrl: null,
 	_customThemeButton: document.body,
