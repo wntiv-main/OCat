@@ -133,6 +133,16 @@ var ocat = {
 		}
 		(this._hooks.pingUsers || (() => { }))();
 	},
+	async _bufferToBase64(buffer) {
+		// use a FileReader to generate a base64 data URI:
+		const base64url = await new Promise(r => {
+			const reader = new FileReader();
+			reader.onload = () => r(reader.result);
+			reader.readAsDataURL(new Blob([buffer]));
+		});
+		// remove the `data:...;base64,` part from the start
+		return base64url.substring(base64url.indexOf(',') + 1);
+	},
 	async _computeHash(blob) {
 		const arrayBuffer = await new Promise((resolve, reject) => {
 			// Convert to ArrayBuffer
@@ -142,7 +152,7 @@ var ocat = {
 			fileReader.readAsArrayBuffer(blob);
 		});
 		const digest = await crypto.subtle.digest("SHA-256", arrayBuffer);
-		return String.fromCharCode.apply(null, new Uint8Array(digest));
+		return await this._bufferToBase64(new Uint8Array(digest));
 	},
 	_fileError(e) {
 		this._clientMessage("Could not load file");
