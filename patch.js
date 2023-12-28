@@ -330,7 +330,7 @@ var ocat = {
 			ocat._getFile(hash, file => {
 				if(ocat._hoveredUrl) URL.revokeObjectURL(ocat._hoveredUrl);
 				ocat._hoveredUrl = URL.createObjectURL(file);
-				t.style.background = `url("${ocat._hoveredUrl}")`;
+				t.style.backgroundImage = `url("${ocat._hoveredUrl}")`;
 			});
 		}, t => {
 			if(ocat._hoveredUrl) URL.revokeObjectURL(ocat._hoveredUrl);
@@ -1179,7 +1179,7 @@ themeSelectorTooltipContainer.classList.add("ocat-tooltip");
 var themeSelectorTooltip = document.createElement("div");
 themeSelectorTooltip.classList.add("ocat-grid");
 themeSelectorTooltip.addEventListener("scroll", e => {
-	e.target.style.setProperty("--ocat-tooltip-scroll", `${e.target.scrollLeft}px`);
+	e.target.style.setProperty("--ocat-theme-scroll", `${e.target.scrollLeft}px`);
 });
 
 themeSelector.addEventListener("click", e => {
