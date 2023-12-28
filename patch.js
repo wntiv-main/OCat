@@ -292,9 +292,10 @@ var ocat = {
 		var iconUrl = URL.createObjectURL(icon);
 		var button = document.createElement("button");
 		button.classList.add("ocat-settings-button");
+		button.classList.add("ocat-theme-button-removable");
 		button.style.backgroundImage = `url("${iconUrl}")`;
 		button.addEventListener("click", function(e) {
-			if(e.button == 2) {
+			if(e.shiftKey) {
 				e.preventDefault();
 				ocat._removeFile(hash);
 				URL.revokeObjectURL(iconUrl);
@@ -899,6 +900,10 @@ body {
 	background: #80808050;
 }
 
+.ocat-shifting .ocat-theme-button-removable {
+	border: 1px solid red;
+}
+
 #ocat-custom-theme-label::after {
 	content: "";
 	display: block;
@@ -1382,6 +1387,13 @@ if(ocat._SETTINGS_KEY in localStorage) {
 
 if(!ocat.notificationSound)
 	ocat.notificationSound = "https://cdn.pixabay.com/download/audio/2023/03/18/audio_900b6765ed.mp3?filename=the-notification-email-143029.mp3";
+
+function onKeyInput(e) {
+	if(e.key != "Shift") return;
+	document.body.classList.toggle("ocat-shifting", e.shiftKey);
+}
+window.addEventListener("keydown", onKeyInput);
+window.addEventListener("keyup", onKeyInput);
 
 ocat._hooks.updateUserData(username, { active: true });
 setInterval(ocat._hooks.pingUsers, 30000);
