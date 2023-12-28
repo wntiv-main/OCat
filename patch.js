@@ -1118,14 +1118,15 @@ const ocat_iconContext = ocat_iconCanvas.getContext('2d', {
 customThemeButton.addEventListener("change", function(e) {
 	document.getElementById("ocat-theme-tooltip").classList.toggle("ocat-active", false);
 	if(!this.files.length) return;
-	var tempUrl = URL.createObjectURL(this.files[0]);
+	var imgBlob = this.files[0];
+	var tempUrl = URL.createObjectURL(imgBlob);
 	var img = new Image();
 	img.addEventListener("load", function(e) {
 		ocat_iconContext.imageSmoothingEnabled = true;
 		ocat_iconContext.clearRect(0, 0, 32, 32);
 		ocat_iconContext.drawImage(e.target, 0, 0, 32, 32);
 		ocat_iconCanvas.convertToBlob().then(icon => {
-			ocat._addFile(this.files[0], icon, function(hash) {
+			ocat._addFile(imgBlob, icon, function(hash) {
 				ocat._addThemeButton(hash, icon);
 				ocat.theme = `custom-background("${hash}")`;
 				ocat._saveSettings();
