@@ -237,7 +237,11 @@ var ocat = {
 				.onsuccess = e => {
 					const cursor = e.target.result;
 					if(cursor) {
-						callback(cursor.value);
+						if(!cursor.value.icon) {
+							this._removeFile(hash);
+						} else {
+							callback(cursor.value);
+						}
 						cursor.continue();
 					}
 				};
