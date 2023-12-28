@@ -331,6 +331,8 @@ var ocat = {
 				ocat.theme = `custom-background("${hash}")`;
 				ocat._saveSettings();
 			}
+		}, {
+			capture: true
 		});
 		this._customThemeButton.parentElement.insertBefore(button, this._customThemeButton);
 	},
@@ -1149,6 +1151,8 @@ themeSelectorTooltip.classList.add("ocat-grid");
 
 themeSelector.addEventListener("click", e => {
 	document.getElementById("ocat-theme-tooltip").classList.toggle("ocat-active");
+}, {
+	capture: true
 });
 
 ocat._themes = [];
@@ -1170,6 +1174,8 @@ ocat._themes = [];
 			document.getElementById("ocat-theme-tooltip").classList.toggle("ocat-active", false);
 			ocat.theme = themeClass;
 			ocat._saveSettings();
+		}, {
+			capture: true
 		});
 		themeSelectorTooltip.appendChild(themeButton);
 	}
@@ -1238,6 +1244,8 @@ randomThemeButton.id = "ocat-random-theme-button";
 randomThemeButton.addEventListener("click", function(e) {
 	var buttons = [...e.target.parentElement.querySelectorAll(":scope .ocat-theme-button")];
 	buttons[Math.floor(Math.random() * buttons.length)].click();
+}, {
+	capture: true
 });
 themeSelectorTooltip.appendChild(randomThemeButton);
 
@@ -1485,6 +1493,11 @@ function onKeyInput(e) {
 }
 window.addEventListener("keydown", onKeyInput);
 window.addEventListener("keyup", onKeyInput);
+window.addEventListener("click", e => {
+	[...document.querySelectorAll(".ocat-active")].forEach(el => {
+		el.classList.remove("ocat-active");
+	});
+});
 
 ocat._hooks.updateUserData(username, { active: true });
 setInterval(ocat._hooks.pingUsers, 30000);
