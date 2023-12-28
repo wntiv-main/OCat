@@ -191,6 +191,7 @@ var ocat = {
 					this._clientMessage("A new version of this page is ready. Please reload or close this tab!");
 				};
 				this._database.onerror = this._fileError;
+				while(this._dbUnsafe) { }
 				callback(this._database);
 			};
 		} else callback(this._database);
