@@ -163,26 +163,38 @@ var ocat = {
 	_database: null,
 	_getDb(callback) {
 		if(!this._database) {
-			var request = indexedDB.open("ocat-db", 1);
+			var request = indexedDB.open("ocat-db", 2);
 			request.onerror = this._fileError;
+			request.onblocked = (event) => {
+				this._clientMessage("Another tab is stopping this one from updating");
+			};
 			request.onupgradeneeded = (event) => {
 				const db = event.target.result;
-				const objectStore = db.createObjectStore("files", { keyPath: "hash" });
+				db.onversionchange = e => {
+					e.target.close();
+					this._clientMessage("A new version of this page is ready. Please reload or close this tab!");
+				};
+				db.createObjectStore("files", { keyPath: "hash" });
 			};
 			request.onsuccess = e => {
 				this._database = e.target.result;
+				this._database.onversionchange = e => {
+					e.target.close();
+					this._clientMessage("A new version of this page is ready. Please reload or close this tab!");
+				};
 				this._database.onerror = this._fileError;
 				callback(this._database);
 			};
 		} else callback(this._database);
 	},
-	_addFile(blob, callback) {
+	_addFile(blob, icon, callback) {
 		this._getDb(db => {
 			this._computeHash(blob).then(hash => {
 				const transaction = db.transaction(["files"], "readwrite");
 				const fileStore = transaction.objectStore("files");
 				const request = fileStore.put({
 					hash: hash,
+					icon: icon,
 					blob: blob
 				});
 				request.onsuccess = e => {
@@ -193,13 +205,32 @@ var ocat = {
 	},
 	_getFile(key, callback) {
 		this._getDb(db => {
-			const transaction = db.transaction(["files"], "readonly");
-			const fileStore = transaction.objectStore("files");
-			const request = fileStore.get(key);
-			request.onsuccess = e => {
-				callback(e.target.result.blob);
-			};
+			db.transaction(["files"], "readonly")
+				.objectStore("files")
+				.get(key)
+				.onsuccess = e => {
+					callback(e.target.result.blob);
+				};
 		});
+	},
+	_removeFile(hash) {
+		this._getDb(db => {
+			db.transaction(["files"], "readwrite")
+				.objectStore("files")
+				.delete(hash);
+		});
+	},
+	_forAllFiles(callback) {
+		db.transaction(["files"], "readonly")
+			.objectStore("files")
+			.openCursor()
+			.onsuccess = e => {
+				const cursor = e.target.result;
+				if(cursor) {
+					callback(cursor.value);
+					cursor.continue();
+				}
+			};
 	},
 	_themeUrl: null,
 	_theme: "darkmode",
@@ -240,6 +271,26 @@ var ocat = {
 				document.body.classList.remove("ocat-dark-style");
 			}
 		}
+	},
+	_customThemeButton: document.body,
+	_addThemeButton(hash, icon) {
+		var iconUrl = URL.createObjectURL(icon);
+		var button = document.createElement("button");
+		button.classList.add("ocat-settings-button");
+		button.style.backgroundImage = `url("${iconUrl}")`;
+		button.addEventListener("click", function(e) {
+			if(e.button == 2) {
+				e.preventDefault();
+				ocat._removeFile(hash);
+				URL.revokeObjectURL(iconUrl);
+				e.target.remove();
+			} else {
+				document.getElementById("ocat-theme-tooltip").classList.toggle("ocat-active", false);
+				ocat.theme = `custom-background("${hash}")`;
+				ocat._saveSettings();
+			}
+		});
+		this._customThemeButton.parentElement.insertBefore(button, this._customThemeButton);
 	},
 	_notificationSound: "",
 	get notificationSound() {
@@ -817,6 +868,7 @@ body {
 	box-sizing: content-box;
 	border-radius: 8px;
 	margin: 5px;
+	background-position: center;
 	background-size: cover;
 }
 
@@ -1044,13 +1096,29 @@ var customThemeButton = document.createElement("input");
 customThemeButton.type = "file";
 customThemeButton.style.display = "none";
 customThemeButton.id = "ocat-custom-theme-selector";
+const ocat_iconCanvas = new OffscreenCanvas(32, 32);
+const ocat_iconContext = ocat_iconCanvas.getContext('2d', {
+	willReadFrequently: true
+});
 customThemeButton.addEventListener("change", function(e) {
 	document.getElementById("ocat-theme-tooltip").classList.toggle("ocat-active", false);
 	if(!this.files.length) return;
-	ocat._addFile(this.files[0], hash => {
-		ocat.theme = `custom-background("${hash}")`;
-		ocat._saveSettings();
+	var tempUrl = URL.createObjectURL(this.files[0]);
+	var img = new Image();
+	img.addEventListener("load", function(e) {
+		ocat_iconContext.imageSmoothingEnabled = true;
+		ocat_iconContext.clearRect(0, 0, 32, 32);
+		ocat_iconContext.drawImage(e.target, 0, 0, 32, 32);
+		ocat_iconCanvas.convertToBlob().then(icon => {
+			ocat._addFile(this.files[0], icon, function(hash) {
+				ocat._addThemeButton(hash, icon);
+				ocat.theme = `custom-background("${hash}")`;
+				ocat._saveSettings();
+			});
+		});
+		URL.revokeObjectURL(tempUrl);
 	});
+	img.src = tempUrl;
 });
 var customThemeLabel = document.createElement("label");
 customThemeLabel.title = "Custom Background";
@@ -1058,8 +1126,13 @@ customThemeLabel.classList.add("ocat-settings-button");
 customThemeLabel.id = "ocat-custom-theme-label";
 customThemeLabel.classList.add("ocat-custom-background-theme");
 customThemeLabel.setAttribute("for", "ocat-custom-theme-selector");
+ocat._customThemeButton = customThemeLabel;
 themeSelectorTooltip.appendChild(customThemeLabel);
 themeSelectorTooltip.appendChild(customThemeButton);
+
+ocat._forAllFiles(file => {
+	ocat._addThemeButton(file.hash, file.icon);
+});
 
 settinsContainer.appendChild(themeSelector);
 settinsContainer.appendChild(themeSelectorTooltip);
