@@ -603,7 +603,8 @@ body {
 }
 
 .minecraftthemeone,
-.minecraftthemetwo {
+.minecraftthemetwo,
+.minecraftthemethree {
 	box-shadow: inset 0 0 0px 50vw #00000075;
 }
 
