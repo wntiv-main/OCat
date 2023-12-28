@@ -44,7 +44,9 @@ var ocat = {
 			}, maxTime);
 		}
 	},
-	_canvas: new OffscreenCanvas(1, 1).getContext('2d'),
+	_canvas: new OffscreenCanvas(1, 1).getContext('2d', {
+		willReadFrequently: true
+	}),
 	_parseCSSColor(color) {
 		if(color instanceof HTMLImageElement) {
 			this._canvas.imageSmoothingEnabled = true;
