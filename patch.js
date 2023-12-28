@@ -942,8 +942,10 @@ body {
 	--ocat-tooltip-shift: 0px;
 	background-size: cover;
 	background-position: center;
-	width: 400px;
-	height: 250px;
+	min-width: 200px;
+	width: 50vw;
+	max-width: 800px;
+	aspect-ratio: 16/9;
 	transform: translate(calc(-50% + var(--ocat-tooltip-shift) - var(--ocat-theme-scroll)), calc(-100% - 32px));
 	top: unset;
 }
@@ -1232,7 +1234,15 @@ customThemeButton.addEventListener("change", function(e) {
 		img.addEventListener("load", function(e) {
 			ocat_iconContext.imageSmoothingEnabled = true;
 			ocat_iconContext.clearRect(0, 0, 32, 32);
-			ocat_iconContext.drawImage(e.target, 0, 0, 32, 32);
+			// Center image in square
+			var hPad = 0;
+			var vPad = 0;
+			if(img.naturalWidth > img.naturalHeight) {
+				hPad = (img.naturalWidth - img.naturalHeight) / 2;
+			} else {
+				vPad = (img.naturalHeight - img.naturalWidth) / 2;
+			}
+			ocat_iconContext.drawImage(e.target, hPad, vPad, img.naturalWidth - 2 * hPad, img.naturalHeight - 2 * vPad, 0, 0, 32, 32);
 			ocat_iconCanvas.convertToBlob().then(icon => {
 				ocat._addFile(blob, icon, function(hash) {
 					var result = callback(hash, icon);
