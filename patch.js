@@ -1254,7 +1254,7 @@ randomThemeButton.addEventListener("click", function(e) {
 	e.stopPropagation();
 	var buttons = [...e.target.parentElement.querySelectorAll(":scope .ocat-theme-button")];
 	buttons[Math.floor(Math.random() * buttons.length)].click();
-}});
+});
 themeSelectorTooltip.appendChild(randomThemeButton);
 
 ocat._forAllFiles(file => {
