@@ -1115,6 +1115,7 @@ ocat._themes = [];
 
 var customThemeButton = document.createElement("input");
 customThemeButton.type = "file";
+customThemeButton.setAttribute("multiple", true);
 customThemeButton.style.display = "none";
 customThemeButton.id = "ocat-custom-theme-selector";
 const ocat_iconCanvas = new OffscreenCanvas(32, 32);
@@ -1124,23 +1125,38 @@ const ocat_iconContext = ocat_iconCanvas.getContext('2d', {
 customThemeButton.addEventListener("change", function(e) {
 	document.getElementById("ocat-theme-tooltip").classList.toggle("ocat-active", false);
 	if(!this.files.length) return;
-	var imgBlob = this.files[0];
-	var tempUrl = URL.createObjectURL(imgBlob);
-	var img = new Image();
-	img.addEventListener("load", function(e) {
-		ocat_iconContext.imageSmoothingEnabled = true;
-		ocat_iconContext.clearRect(0, 0, 32, 32);
-		ocat_iconContext.drawImage(e.target, 0, 0, 32, 32);
-		ocat_iconCanvas.convertToBlob().then(icon => {
-			ocat._addFile(imgBlob, icon, function(hash) {
-				ocat._addThemeButton(hash, icon);
-				ocat.theme = `custom-background("${hash}")`;
-				ocat._saveSettings();
+	var files = [...this.files];
+	function addImage(blob, callback) {
+		var tempUrl = URL.createObjectURL(blob);
+		var img = new Image();
+		img.addEventListener("load", function(e) {
+			ocat_iconContext.imageSmoothingEnabled = true;
+			ocat_iconContext.clearRect(0, 0, 32, 32);
+			ocat_iconContext.drawImage(e.target, 0, 0, 32, 32);
+			ocat_iconCanvas.convertToBlob().then(icon => {
+				ocat._addFile(blob, icon, function(hash) {
+					var result = callback(hash, icon);
+					if(result) {
+						addImage(result, callback);
+					}
+				});
 			});
+			URL.revokeObjectURL(tempUrl);
 		});
-		URL.revokeObjectURL(tempUrl);
-	});
-	img.src = tempUrl;
+		img.src = tempUrl;
+	}
+	if(files.length > 1) {
+		addImage(files.shift(), (hash, icon) => {
+			ocat._addThemeButton(hash, icon);
+			return files.shift();
+		});
+	} else {
+		addImage(files.shift(), (hash, icon) => {
+			ocat._addThemeButton(hash, icon);
+			ocat.theme = `custom-background("${hash}")`;
+			ocat._saveSettings();
+		});
+	}
 });
 var customThemeLabel = document.createElement("label");
 customThemeLabel.title = "Custom Background";
