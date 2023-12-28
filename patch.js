@@ -464,18 +464,6 @@ body {
 	box-shadow: inset 0 0 0px 50vw #00000075;
 }
 
-.ocat-dark-style .ocat-invert-dark {
-	filter: invert(100%);
-}
-
-.ocat-icon {
-	width: 100%;
-	height: 100%;
-	user-select: none;
-	pointer-events: none;
-	-webkit-user-drag: none;
-}
-
 .ocat-input-container {
 	display: flex;
 	align-items: center;
@@ -818,6 +806,14 @@ body {
 .ocat-settings-button:not([class*="theme"]):not([class*="mode"]):active {
 	background: #80808050;
 }
+
+#ocat-custom-theme-label::after {
+	content: "";
+	background: url("https://cdn-icons-png.flaticon.com/512/4211/4211763.png");
+	background-size: cover;
+	width: 100%;
+	height: 100%;
+}
 `;
 document.head.appendChild(css);
 
@@ -1028,13 +1024,9 @@ customThemeButton.addEventListener("change", function(e) {
 var customThemeLabel = document.createElement("label");
 customThemeLabel.title = "Custom Background";
 customThemeLabel.classList.add("ocat-settings-button");
+customThemeLavel.id = "ocat-custom-theme-label";
 customThemeLabel.classList.add("ocat-custom-background-theme");
 customThemeLabel.setAttribute("for", "ocat-custom-theme-selector");
-var customThemeIcon = document.createElement("img");
-customThemeIcon.src = "https://cdn-icons-png.flaticon.com/512/4211/4211763.png";
-customThemeIcon.classList.add("ocat-icon");
-customThemeIcon.classList.add("ocat-invert-dark");
-customThemeLabel.appendChild(customThemeIcon);
 themeSelectorTooltip.appendChild(customThemeLabel);
 themeSelectorTooltip.appendChild(customThemeButton);
 
