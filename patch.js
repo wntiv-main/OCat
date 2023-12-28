@@ -855,14 +855,20 @@ body {
 
 #ocat-theme-tooltip .ocat-grid {
 	display: grid;
-	padding: 5px;
-	grid-template: ". . .";
+	grid-auto-flow: column;
+	grid-template-columns: repeat(auto-fill, calc(1em + 18px));
+	grid-template-rows: repeat(4, 1fr);
+	grid-gap: 10px 10px;
 	max-height: 50vh;
 	overflow: hidden;
-	overflow-y: auto;
+	padding: 8px;
 	border-radius: 8px;
 	z-index: 2;
 	position: relative;
+}
+
+#ocat-theme-tooltip .ocat-grid .ocat-settings-button {
+	margin: 0;
 }
 
 .ocat-tooltip::after {
@@ -1236,11 +1242,11 @@ ocat._hooks.updateUserData = (user, data) => {
 };
 
 ocat._hooks.possibleConnectMessage = (m) => {
-	if(/^(.*) joined\s*the\s*chat\.?\s*$/i.test(m)) {
-		ocat._hooks.updateUserData(m.replace(/^(.*) joined\s*the\s*chat\.?\s*$/i, "$1"), { active: true });
+	if(/^(.*) joined\s*the\s*chat.*\.?\s*$/i.test(m)) {
+		ocat._hooks.updateUserData(m.replace(/^(.*) joined\s*the\s*chat.*\.?\s*$/i, "$1"), { active: true });
 	}
-	if(/^(.*) left\s*the\s*chat\.?\s*$/i.test(m)) {
-		ocat._hooks.updateUserData(m.replace(/^(.*) left\s*the\s*chat\.?\s*$/i, "$1"), { online: false });
+	if(/^(.*) left\s*the\s*chat.*\.?\s*$/i.test(m)) {
+		ocat._hooks.updateUserData(m.replace(/^(.*) left\s*the\s*chat.*\.?\s*$/i, "$1"), { online: false });
 		ocat._hooks.pingUsers();
 	}
 };
