@@ -160,16 +160,17 @@ var ocat = {
 			this._clientMessage(`Error: ${e.target.errorCode}`);
 		}
 	},
+	_dbUnsafe: 0,
 	_database: null,
 	_getDb(callback) {
 		if(!this._database) {
 			var request = indexedDB.open("ocat-db", 2);
 			request.onerror = this._fileError;
-			request.onblocked = (event) => {
+			request.onblocked = e => {
 				this._clientMessage("Another tab is stopping this one from updating");
 			};
-			request.onupgradeneeded = (event) => {
-				const db = event.target.result;
+			request.onupgradeneeded = e => {
+				const db = e.target.result;
 				db.onversionchange = e => {
 					e.target.close();
 					this._clientMessage("A new version of this page is ready. Please reload or close this tab!");
@@ -178,8 +179,10 @@ var ocat = {
 					db.createObjectStore("files", { keyPath: "hash" });
 				}
 				if(db.version < 2) {
-					db.objectStore("files").clear();
+					this._dbUnsafe++;
+					db.objectStore("files").clear().onsuccess = () => this._dbUnsafe--;
 				}
+				while(this._dbUnsafe) { }
 			};
 			request.onsuccess = e => {
 				this._database = e.target.result;
