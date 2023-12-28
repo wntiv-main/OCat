@@ -457,6 +457,11 @@ body {
 .ocat-custom-background-theme {
 	background-image: var(--ocat-custom-background);
 	background-size: cover;
+	box-shadow: inset 0 0 0px 50vw #ffffff75;
+}
+
+.ocat-dark-style .ocat-custom-background-theme {
+	box-shadow: inset 0 0 0px 50vw #00000075;
 }
 
 .minecraftthemeone,
@@ -809,10 +814,16 @@ body {
 
 #ocat-custom-theme-label::after {
 	content: "";
+	display: block;
 	background: url("https://cdn-icons-png.flaticon.com/512/4211/4211763.png");
 	background-size: cover;
-	width: 100%;
-	height: 100%;
+	margin: -3px;
+	width: calc(100% + 6px);
+	height: calc(100% + 6px);
+}
+
+.ocat-dark-style #ocat-custom-theme-label::after {
+	filter: invert(1);
 }
 `;
 document.head.appendChild(css);
