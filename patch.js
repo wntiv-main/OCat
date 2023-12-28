@@ -187,7 +187,11 @@ var ocat = {
 			request.onsuccess = e => {
 				this._database = e.target.result;
 				if(!this._database.objectStoreNames.contains("files")) {
-					this._database.createObjectStore("files", { keyPath: "hash" });
+					this._dbUnsafe++;
+					var req = indexedDB.deleteDatabase("ocat-db");
+					req.onsuccess = function() {
+						location.reload();
+					};
 				}
 				this._database.onversionchange = e => {
 					e.target.close();
