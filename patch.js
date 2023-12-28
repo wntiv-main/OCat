@@ -221,16 +221,18 @@ var ocat = {
 		});
 	},
 	_forAllFiles(callback) {
-		db.transaction(["files"], "readonly")
-			.objectStore("files")
-			.openCursor()
-			.onsuccess = e => {
-				const cursor = e.target.result;
-				if(cursor) {
-					callback(cursor.value);
-					cursor.continue();
-				}
-			};
+		this._getDb(db => {
+			db.transaction(["files"], "readonly")
+				.objectStore("files")
+				.openCursor()
+				.onsuccess = e => {
+					const cursor = e.target.result;
+					if(cursor) {
+						callback(cursor.value);
+						cursor.continue();
+					}
+				};
+		});
 	},
 	_themeUrl: null,
 	_theme: "darkmode",
