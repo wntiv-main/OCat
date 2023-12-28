@@ -849,11 +849,20 @@ body {
 	display: block;
 }
 
+#ocat-theme-tooltip {
+	padding: 0;
+}
+
 #ocat-theme-tooltip .ocat-grid {
 	display: grid;
+	padding: 5px;
 	grid-template: ". . .";
-	overflow-y: auto;
 	max-height: 50vh;
+	overflow: hidden;
+	overflow-y: auto;
+	border-radius: 8px;
+	z-index: 2;
+	position: relative;
 }
 
 .ocat-tooltip::after {
