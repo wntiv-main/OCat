@@ -859,8 +859,8 @@ body {
 	grid-template-columns: repeat(auto-fill, calc(1em + 18px));
 	grid-template-rows: repeat(4, 1fr);
 	grid-gap: 10px 10px;
-	max-height: 50vh;
-	overflow: hidden;
+	max-width: 50vw;
+	overflow-x: auto;
 	padding: 8px;
 	border-radius: 8px;
 	z-index: 2;
