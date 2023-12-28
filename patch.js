@@ -467,6 +467,7 @@ body {
 	color: black;
 }
 
+.ocat-dark-style.ocat-custom-background-theme,
 .ocat-dark-style .ocat-custom-background-theme {
 	box-shadow: inset 0 0 0px 50vw #00000075;
 	color: white;
