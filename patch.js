@@ -1,7 +1,7 @@
 if(!!ocat) throw new Error("Already Injected");
 
 var ocat = {
-	_LAST_SEEN_CCAT_HASH: 1002144698,
+	_LAST_SEEN_CCAT_HASH: 637104748,
 	_notification: new Audio(),
 	_currentNotification: null,
 	_currentBannerColor: "transparent",
@@ -905,6 +905,7 @@ body {
 }
 
 #ocat-theme-tooltip .ocat-grid {
+	--ocat-theme-scroll: 0px;
 	display: grid;
 	grid-auto-flow: column;
 	grid-template-columns: repeat(auto-fit, calc(1em + 18px));
@@ -939,9 +940,11 @@ body {
 
 .ocat-theme-tooltip {
 	--ocat-tooltip-shift: 0px;
+	background-size: cover;
+	background-position: center;
 	width: 400px;
 	height: 250px;
-	transform: translate(calc(-50% + var(--ocat-tooltip-shift)), calc(-100% - 32px));
+	transform: translate(calc(-50% + var(--ocat-tooltip-shift) - var(--ocat-theme-scroll)), calc(-100% - 32px));
 	top: unset;
 }
 
@@ -1175,6 +1178,9 @@ themeSelectorTooltipContainer.id = "ocat-theme-tooltip";
 themeSelectorTooltipContainer.classList.add("ocat-tooltip");
 var themeSelectorTooltip = document.createElement("div");
 themeSelectorTooltip.classList.add("ocat-grid");
+themeSelectorTooltip.addEventListener("scroll", e => {
+	e.target.style.setProperty("--ocat-tooltip-scroll", `${e.target.scrollLeft}px`);
+});
 
 themeSelector.addEventListener("click", e => {
 	e.stopPropagation();
@@ -1258,6 +1264,7 @@ customThemeLabel.classList.add("ocat-settings-button");
 customThemeLabel.id = "ocat-custom-theme-label";
 customThemeLabel.classList.add("ocat-custom-background-theme");
 customThemeLabel.setAttribute("for", "ocat-custom-theme-selector");
+customThemeLabel.addEventListener("click", e => e.stopPropagation());
 ocat._customThemeButton = customThemeLabel;
 themeSelectorTooltip.appendChild(customThemeLabel);
 themeSelectorTooltip.appendChild(customThemeButton);
