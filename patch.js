@@ -1194,6 +1194,7 @@ themeSelectorTooltip.appendChild(customThemeLabel);
 themeSelectorTooltip.appendChild(customThemeButton);
 
 var randomThemeButton = document.createElement("button");
+randomThemeButton.textContent = "\u{1F3B2}";
 randomThemeButton.title = "Random Theme";
 randomThemeButton.classList.add("ocat-settings-button");
 randomThemeButton.id = "ocat-random-theme-button";
