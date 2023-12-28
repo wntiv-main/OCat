@@ -238,7 +238,7 @@ var ocat = {
 					const cursor = e.target.result;
 					if(cursor) {
 						if(!cursor.value.icon) {
-							this._removeFile(hash);
+							this._removeFile(cursor.value.hash);
 						} else {
 							callback(cursor.value);
 						}
