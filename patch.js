@@ -164,7 +164,7 @@ var ocat = {
 	_database: null,
 	_getDb(callback) {
 		if(!this._database) {
-			var request = indexedDB.open("ocat-db", 2);
+			var request = indexedDB.open("ocat-db", 3);
 			request.onerror = this._fileError;
 			request.onblocked = e => {
 				this._clientMessage("Another tab is stopping this one from updating");
@@ -182,11 +182,16 @@ var ocat = {
 					this._dbUnsafe++;
 					db.objectStore("files").clear().onsuccess = () => this._dbUnsafe--;
 				}
+				if(db.version < 3 || !db.objectStoreNames.contains("messages")) {
+					var messageStore = db.createObjectStore("messages", { keyPath: "id", autoIncrement: true });
+					messageStore.createIndex("timestamp", "timestamp");
+				}
 				while(this._dbUnsafe) { }
 			};
 			request.onsuccess = e => {
 				this._database = e.target.result;
-				if(!this._database.objectStoreNames.contains("files")) {
+				if(!this._database.objectStoreNames.contains("files")
+					|| !this._database.objectStoreNames.contains("messages")) {
 					this._dbUnsafe++;
 					var req = indexedDB.deleteDatabase("ocat-db");
 					req.onsuccess = function() {
