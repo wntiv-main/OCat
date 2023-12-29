@@ -565,7 +565,8 @@ socket.io.on("reconnect_failed", () => {
 });
 
 // Clear old content
-document.getElementById("message-container").replaceChildren();
+var ocat_msgContainer = document.getElementById("message-container");
+ocat_msgContainer.replaceWith(ocat_msgContainer.cloneNode(false));
 
 var ocat_bannerContainer = document.createElement("div");
 ocat_bannerContainer.classList.add("ocat-banner-container");
@@ -1632,7 +1633,7 @@ patch("message",
 		msg = ocat_messageContent.join(':');
 		msg`)
 		.replace(/^\s*(function\s*)\(((?:[a-zA-Z_0-9]+(?:\s*=\s*.*?)?),?\s*)*\)/, "$1($2, ocat_id)")
-		.replace(/^\s*\(?((?:[a-zA-Z_0-9]+(?:\s*=\s*.*?)?),?\s*)*\)?(\s*=>)/, "($1, ocat_id)$2")
+		.replace(/^\s*\(?((?:[a-zA-Z_0-9]+(?:\s*=(?!>)\s*.*?)?,?\s*)*)\)?(\s*=>)/, "($1, ocat_id)$2")
 		.replace(/([a-zA-Z0-9_]+)\.style\.color\s*=\s*(['"`])blue\2/g,
 			`$1.classList.add($2ocat-link$2)`)
 		.replace(/([a-zA-Z0-9_]+)\.append\s*\((.*)\)\s*;?\s*$/gm,
@@ -1652,7 +1653,7 @@ patch("html-message",
 		.replace(/(?<!function\s*\()msg/g,
 			"((ocat.antiXss ? ocat._hooks.antiXss(ocat._hooks.htmlMsg(msg)) : ocat._hooks.htmlMsg(msg)))")
 		.replace(/^\s*(function\s*)\(((?:[a-zA-Z_0-9]+(?:\s*=\s*.*?)?),?\s*)*\)/, "$1($2, ocat_id)")
-		.replace(/^\s*\(?((?:[a-zA-Z_0-9]+(?:\s*=\s*.*?)?),?\s*)*\)?(\s*=>)/, "($1, ocat_id)$2")
+		.replace(/^\s*\(?((?:[a-zA-Z_0-9]+(?:\s*=(?!>)\s*.*?)?,?\s*)*)\)?(\s*=>)/, "($1, ocat_id)$2")
 		.replace(/(document\.getElementById\((['"`])message-container\2\).appendChild)\((.*)\)/,
 			`var ocat_messageContainer = ($3);
 			if(ocat._hooks.onMessageContainer(ocat_messageContainer, msg, ocat_id, "HTML"))
