@@ -135,6 +135,7 @@ var ocat = {
 	},
 	_showContextMenu(e, items) {
 		e.preventDefault();
+		[...document.getElementsByClassName("ocat-context-menu")].forEach(el => el.remove());
 		var contextMenuContainer = document.createElement("ul");
 		contextMenuContainer.classList.add("ocat-context-menu");
 		items.forEach(item => {
