@@ -1609,8 +1609,8 @@ ocat._hooks.htmlMsg = (msg) => {
 
 patch("message",
 	c => c.toString().includes("finalContent"),
-	c => c.replace(/^\s*(function\s*)\(((?:[a-zA-Z_0-9]+(?:\s*=\s*.*?)),?\s*)*\)/, "$1($2, ocat_id)")
-		.replace(/^\s*\(?((?:[a-zA-Z_0-9]+(?:\s*=\s*.*?)),?\s*)*\)?(\s*=>)/, "($1, ocat_id)$2")
+	c => c.replace(/^\s*(function\s*)\(((?:[a-zA-Z_0-9]+(?:\s*=\s*.*?)?),?\s*)*\)/, "$1($2, ocat_id)")
+		.replace(/^\s*\(?((?:[a-zA-Z_0-9]+(?:\s*=\s*.*?)?),?\s*)*\)?(\s*=>)/, "($1, ocat_id)$2")
 		.replace(/(?<!function\s*\()msg(?!\s*=>)/, `
 		var ocat_messageContent = msg.split(':');
 		var ocat_prefix = null;
@@ -1636,8 +1636,8 @@ patch("message",
 
 patch("html-message",
 	() => true,
-	c => c.replace(/^\s*(function\s*)\(((?:[a-zA-Z_0-9]+(?:\s*=\s*.*?)),?\s*)*\)/, "$1($2, ocat_id)")
-		.replace(/^\s*\(?((?:[a-zA-Z_0-9]+(?:\s*=\s*.*?)),?\s*)*\)?(\s*=>)/, "($1, ocat_id)$2")
+	c => c.replace(/^\s*(function\s*)\(((?:[a-zA-Z_0-9]+(?:\s*=\s*.*?)?),?\s*)*\)/, "$1($2, ocat_id)")
+		.replace(/^\s*\(?((?:[a-zA-Z_0-9]+(?:\s*=\s*.*?)?),?\s*)*\)?(\s*=>)/, "($1, ocat_id)$2")
 		.replace(/(document\.getElementById\((['"`])message-container\2\).appendChild)\((.*)\)/,
 			`var ocat_messageContainer = ($3);
 			ocat_messageContainer.dataset.ocatMessageId = ocat_id;
