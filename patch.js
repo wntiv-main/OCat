@@ -1455,11 +1455,11 @@ ocat._hooks.updateUserData = (user, data) => {
 		el.addEventListener("contextmenu", e => ocat._showContextMenu(e, [
 			{
 				label: ocat.blockedUsers.has(e.target.textContent) ? "Unblock" : "Block",
-				action: (() => {
-					if(!ocat.blockedUsers.delete(this.user)) {
-						ocat.blockedUsers.add(this.user);
+				action: ((user) => {
+					if(!ocat.blockedUsers.delete(user)) {
+						ocat.blockedUsers.add(user);
 					}
-				}).bind({ user: e.target.textContent })
+				}).bind(null, e.target.textContent)
 			}
 		]));
 		memberList.appendChild(el);
