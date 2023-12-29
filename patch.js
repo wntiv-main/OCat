@@ -564,6 +564,9 @@ socket.io.on("reconnect_failed", () => {
 	}
 });
 
+// Clear old content
+document.getElementById("message-container").innerHTML = "";
+
 var ocat_bannerContainer = document.createElement("div");
 ocat_bannerContainer.classList.add("ocat-banner-container");
 ocat._banner.classList.add("ocat-banner");
@@ -1616,9 +1619,7 @@ ocat._hooks.onMessageContainer = (el, msg, id, type) => {
 
 patch("message",
 	c => c.toString().includes("finalContent"),
-	c => c.replace(/^\s*(function\s*)\(((?:[a-zA-Z_0-9]+(?:\s*=\s*.*?)?),?\s*)*\)/, "$1($2, ocat_id)")
-		.replace(/^\s*\(?((?:[a-zA-Z_0-9]+(?:\s*=\s*.*?)?),?\s*)*\)?(\s*=>)/, "($1, ocat_id)$2")
-		.replace(/(?<!function\s*\()msg(?!\s*=>)/, `
+	c => c.replace(/(?<!function\s*\()msg(?!\s*=>)/, `
 		var ocat_messageContent = msg.split(':');
 		var ocat_prefix = null;
 		if(ocat_messageContent.length > 1) {
@@ -1629,8 +1630,9 @@ patch("message",
 			ocat_prefix.textContent = ocat_messageContent.shift() + ':';
 		}
 		msg = ocat_messageContent.join(':');
-		msg
-		`)
+		msg`)
+		.replace(/^\s*(function\s*)\(((?:[a-zA-Z_0-9]+(?:\s*=\s*.*?)?),?\s*)*\)/, "$1($2, ocat_id)")
+		.replace(/^\s*\(?((?:[a-zA-Z_0-9]+(?:\s*=\s*.*?)?),?\s*)*\)?(\s*=>)/, "($1, ocat_id)$2")
 		.replace(/([a-zA-Z0-9_]+)\.style\.color\s*=\s*(['"`])blue\2/g,
 			`$1.classList.add($2ocat-link$2)`)
 		.replace(/([a-zA-Z0-9_]+)\.append\s*\((.*)\)\s*;?\s*$/gm,
@@ -1646,14 +1648,15 @@ patch("message",
 
 patch("html-message",
 	() => true,
-	c => c.replace(/^\s*(function\s*)\(((?:[a-zA-Z_0-9]+(?:\s*=\s*.*?)?),?\s*)*\)/, "$1($2, ocat_id)")
+	c => c
+		.replace(/(?<!function\s*\()msg/g,
+			"((ocat.antiXss ? ocat._hooks.antiXss(ocat._hooks.htmlMsg(msg)) : ocat._hooks.htmlMsg(msg)))")
+		.replace(/^\s*(function\s*)\(((?:[a-zA-Z_0-9]+(?:\s*=\s*.*?)?),?\s*)*\)/, "$1($2, ocat_id)")
 		.replace(/^\s*\(?((?:[a-zA-Z_0-9]+(?:\s*=\s*.*?)?),?\s*)*\)?(\s*=>)/, "($1, ocat_id)$2")
 		.replace(/(document\.getElementById\((['"`])message-container\2\).appendChild)\((.*)\)/,
 			`var ocat_messageContainer = ($3);
 			if(ocat._hooks.onMessageContainer(ocat_messageContainer, msg, ocat_id, "HTML"))
 				$1(ocat_messageContainer)`)
-		.replace(/(?<!function\s*\()msg/g,
-		"((ocat.antiXss ? ocat._hooks.antiXss(ocat._hooks.htmlMsg(msg)) : ocat._hooks.htmlMsg(msg)))")
 );
 
 ['message', 'html-message'].forEach(type => {
@@ -1697,6 +1700,7 @@ window.addEventListener("click", e => {
 
 document.getElementById("message-container").scrollTop = document.getElementById("message-container").scrollHeight;
 
+socket.emit("message-history");
 ocat._hooks.updateUserData(username, { active: true });
 setInterval(ocat._hooks.pingUsers, 30000);
 ocat._bannerMessage("success", "ocat ready!", 3000);
