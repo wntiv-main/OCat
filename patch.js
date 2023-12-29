@@ -1607,6 +1607,13 @@ ocat._hooks.htmlMsg = (msg) => {
 	return sandbox.innerHTML;
 };
 
+ocat._hooks.onMessageContainer = (el, msg, id, type) => {
+	el.setAttribute("tabindex", -1);
+	el.dataset.ocatMessageId = id;
+	ocat._notify(msg, type, el);
+	return !document.querySelector(`#message-container > div[ocat-member-id="${id}"]`);
+}
+
 patch("message",
 	c => c.toString().includes("finalContent"),
 	c => c.replace(/^\s*(function\s*)\(((?:[a-zA-Z_0-9]+(?:\s*=\s*.*?)?),?\s*)*\)/, "$1($2, ocat_id)")
@@ -1627,11 +1634,14 @@ patch("message",
 		.replace(/([a-zA-Z0-9_]+)\.style\.color\s*=\s*(['"`])blue\2/g,
 			`$1.classList.add($2ocat-link$2)`)
 		.replace(/([a-zA-Z0-9_]+)\.append\s*\((.*)\)\s*;?\s*$/gm,
-			`var ocat_suffix = document.createElement("span");
+		`var ocat_suffix = document.createElement("span");
 			ocat_suffix.append($2);
 			if(ocat_prefix) $1.appendChild(ocat_prefix);
-			$1.dataset.ocatMessageId = ocat_id;
 			$1.appendChild(ocat_suffix);`)
+		.replace(/(document\.getElementById\((['"`])message-container\2\).appendChild)\((.*)\)/,
+			`var ocat_messageContainer = ($3);
+			if(ocat._hooks.onMessageContainer(ocat_messageContainer, msg, ocat_id, "CHAT"))
+				$1(ocat_messageContainer)`)
 );
 
 patch("html-message",
@@ -1640,18 +1650,14 @@ patch("html-message",
 		.replace(/^\s*\(?((?:[a-zA-Z_0-9]+(?:\s*=\s*.*?)?),?\s*)*\)?(\s*=>)/, "($1, ocat_id)$2")
 		.replace(/(document\.getElementById\((['"`])message-container\2\).appendChild)\((.*)\)/,
 			`var ocat_messageContainer = ($3);
-			ocat_messageContainer.dataset.ocatMessageId = ocat_id;
-			$1(ocat_messageContainer)
-			`)
+			if(ocat._hooks.onMessageContainer(ocat_messageContainer, msg, ocat_id, "HTML"))
+				$1(ocat_messageContainer)`)
 		.replace(/(?<!function\s*\()msg/g,
 		"((ocat.antiXss ? ocat._hooks.antiXss(ocat._hooks.htmlMsg(msg)) : ocat._hooks.htmlMsg(msg)))")
 );
 
 ['message', 'html-message'].forEach(type => {
 	socket.on(type, function(msg) {
-		var el = document.getElementById("message-container").lastElementChild;
-		el.setAttribute("tabindex", -1);
-		ocat._notify(msg, type.split("-")[0], el);
 		var msgs = document.getElementById("message-container");
 		if(msgs.scrollHeight - msgs.scrollTop - msgs.clientHeight < 100)
 			msgs.scrollTop = msgs.scrollHeight;
