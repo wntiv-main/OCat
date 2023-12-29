@@ -1089,7 +1089,7 @@ body {
 	margin: 0;
 	padding: 0;
 	border-radius: 16px;
-	min-width: 100px;
+	min-width: 250px;
 	backdrop-filter: blur(10px);
 }
 
@@ -1150,6 +1150,7 @@ ocat._hooks.markdown = (name, msg) => {
 				e.style.padding = "0.5em 1em";
 				e.style.margin = "0";
 				e.style.borderRadius = "0.5em";
+				e.classList.add("ocat-large-code");
 			}
 		},
 		{
@@ -1159,6 +1160,7 @@ ocat._hooks.markdown = (name, msg) => {
 				e.style.background = "#80808040";
 				e.style.padding = "0.3em";
 				e.style.borderRadius = "0.5em";
+				e.classList.add("ocat-small-code");
 			}
 		}
 	];
@@ -1607,7 +1609,9 @@ ocat._hooks.htmlMsg = (msg) => {
 
 patch("message",
 	c => c.toString().includes("finalContent"),
-	c => c.replace(/(?<!function\s*\()msg(?!\s*=>)/, `
+	c => c.replace(/^\s*(function\s*)\(((?:[a-zA-Z_0-9]+(?:\s*=\s*.*?)),?\s*)*\)/, "$1($2, ocat_id)")
+		.replace(/^\s*\(?((?:[a-zA-Z_0-9]+(?:\s*=\s*.*?)),?\s*)*\)?(\s*=>)/, "($1, ocat_id)$2")
+		.replace(/(?<!function\s*\()msg(?!\s*=>)/, `
 		var ocat_messageContent = msg.split(':');
 		var ocat_prefix = null;
 		if(ocat_messageContent.length > 1) {
@@ -1626,12 +1630,20 @@ patch("message",
 			`var ocat_suffix = document.createElement("span");
 			ocat_suffix.append($2);
 			if(ocat_prefix) $1.appendChild(ocat_prefix);
+			$1.dataset.ocatMessageId = ocat_id;
 			$1.appendChild(ocat_suffix);`)
 );
 
 patch("html-message",
 	() => true,
-	c => c.replace(/(?<!function\s*\()msg/g,
+	c => c.replace(/^\s*(function\s*)\(((?:[a-zA-Z_0-9]+(?:\s*=\s*.*?)),?\s*)*\)/, "$1($2, ocat_id)")
+		.replace(/^\s*\(?((?:[a-zA-Z_0-9]+(?:\s*=\s*.*?)),?\s*)*\)?(\s*=>)/, "($1, ocat_id)$2")
+		.replace(/(document\.getElementById\((['"`])message-container\2\).appendChild)\((.*)\)/,
+			`var ocat_messageContainer = ($3);
+			ocat_messageContainer.dataset.ocatMessageId = ocat_id;
+			$1(ocat_messageContainer)
+			`)
+		.replace(/(?<!function\s*\()msg/g,
 		"((ocat.antiXss ? ocat._hooks.antiXss(ocat._hooks.htmlMsg(msg)) : ocat._hooks.htmlMsg(msg)))")
 );
 
