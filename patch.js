@@ -1083,8 +1083,33 @@ body {
 .ocat-context-menu {
 	position: fixed;
 	background: #80808030;
-	overflow-y: scroll;
+	overflow-y: auto;
 	max-height: calc(100vh - 10px);
+	margin: 0;
+	padding: 0;
+	border-radius: 16px;
+	min-width: 100px;
+	backdrop-filter: blur(10px);
+}
+
+.ocat-context-menu > li {
+	padding: 5px 16px;
+}
+
+.ocat-context-menu > li:hover {
+	background: #80808030;
+}
+
+.ocat-context-menu > li:active {
+	background: #80808050;
+}
+
+.ocat-context-menu > li:first-of-type {
+	padding-top: 16px;
+}
+
+.ocat-context-menu > li:last-of-type {
+	padding-bottom: 16px;
 }
 `;
 document.head.appendChild(css);
@@ -1646,10 +1671,10 @@ function onKeyInput(e) {
 window.addEventListener("keydown", onKeyInput);
 window.addEventListener("keyup", onKeyInput);
 window.addEventListener("click", e => {
-	[...document.getElementsByClassName("ocat-active"),
-		...document.getElementsByClassName("ocat-context-menu")].forEach(el => {
+	[...document.getElementsByClassName("ocat-active")].forEach(el => {
 		el.classList.remove("ocat-active");
 	});
+	[...document.getElementsByClassName("ocat-context-menu")].forEach(el => el.remove());
 });
 
 document.getElementById("message-container").scrollTop = document.getElementById("message-container").scrollHeight;
