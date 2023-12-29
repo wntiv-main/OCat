@@ -1641,6 +1641,8 @@ window.addEventListener("click", e => {
 	});
 });
 
+document.getElementById("message-container").scrollTop = document.getElementById("message-container").scrollHeight;
+
 ocat._hooks.updateUserData(username, { active: true });
 setInterval(ocat._hooks.pingUsers, 30000);
 ocat._bannerMessage("success", "ocat ready!", 3000);
