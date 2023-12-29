@@ -755,6 +755,7 @@ body {
 	overflow-x: hidden;
 	overflow-y: auto;
 	position: relative;
+	padding: 0;
 }
 
 #message-container > div:not(.ocat-banner-container) {
