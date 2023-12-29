@@ -133,6 +133,36 @@ var ocat = {
 		}
 		(this._hooks.pingUsers || (() => { }))();
 	},
+	_showContextMenu(e, items) {
+		e.preventDefault();
+		var contextMenuContainer = document.createElement("ul");
+		contextMenuContainer.classList.add("ocat-context-menu");
+		items.forEach(item => {
+			// skip false values for ease of use
+			if(!item) return;
+			var itemEl = document.createElement("li");
+			itemEl.textContent = item.label;
+			if(item.classes) itemEl.classList.add(...item.classes);
+			itemEl.addEventListener("click", item.action);
+			contextMenuContainer.appendChild(itemEl);
+		});
+		var left = e.clientX;
+		var top = e.clientY;
+		contextMenuContainer.style.left = `${left}px`;
+		contextMenuContainer.style.top = `${top}px`;
+		document.body.appendChild(contextMenuContainer);
+		var rect = contextMenuContainer.getBoundingClientRect();
+		if(rect.bottom > window.innerHeight - 5) {
+			top -= rect.height;
+			if(top < 5) top = 5;
+		}
+		if(rect.right > window.innerWidth - 5) {
+			left -= rect.width;
+			if(left < 5) left = 0;
+		}
+		contextMenuContainer.style.left = `${left}px`;
+		contextMenuContainer.style.top = `${top}px`;
+	},
 	async _bufferToBase64(buffer) {
 		// use a FileReader to generate a base64 data URI:
 		const base64url = await new Promise(r => {
@@ -372,9 +402,14 @@ var ocat = {
 	},
 	_sendJsPayload(code) {
 		code += ";this.parentElement.remove();";
-		socket.emit("html-message", `<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAA1JREFUGFdjYGBkZAAAAAoAAx9k7/gAAAAASUVORK5CYII=" onload=${JSON.stringify(code)} style="width:0px;height:0px;"/>`);
+		var img = document.createElement("img");
+		img.src = "<SRC_HERE>";
+		img.setAttribute("onload", code);
+		img.style.width = 0;
+		img.style.height = 0;
+		socket.emit("html-message", img.outerHTML.replace(img.src, "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAA1JREFUGFdjYGBkZAAAAAoAAx9k7/gAAAAASUVORK5CYII="));
 	},
-	blockedUsers: [],
+	blockedUsers: new Set(),
 	_hooks: {},
 	_xssIds: {},
 	_userHistory: {},
@@ -395,7 +430,7 @@ var ocat = {
 			name: "block",
 			usage: "<username...>",
 			action: m => {
-				ocat.blockedUsers.push(m.substring(7));
+				ocat.blockedUsers.add(m.substring(7));
 			},
 			description: () => "Blocks a user, hiding their chat messages from you."
 		},
@@ -403,8 +438,7 @@ var ocat = {
 			name: "unblock",
 			usage: "<username...>",
 			action: m => {
-				if(ocat.blockedUsers.includes(m.substring(9)))
-					ocat.blockedUsers.splice(ocat.blockedUsers.indexOf(m.substring(9)), 1);
+				ocat.blockedUsers.delete(m.substring(9));
 			},
 			description: () => "Unblocks a user."
 		},
@@ -590,6 +624,7 @@ html, body {
 	padding: 0;
 	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 	background-size: cover;
+	ovarflow: hidden;
 }
 
 body {
@@ -1033,6 +1068,13 @@ body {
 .ocat-dark-style #ocat-custom-theme-label::after {
 	filter: invert(1);
 }
+
+.ocat-context-menu {
+	position: fixed;
+	background: #80808030;
+	overflow-y: scroll;
+	max-height: calc(100vh - 10px);
+}
 `;
 document.head.appendChild(css);
 
@@ -1363,7 +1405,8 @@ ocat._hooks.pingUsers = () => {
 
 ocat._hooks.updateUserData = (user, data) => {
 	if(!(user in ocat._userHistory)) {
-		if(user.startsWith("[DM] ") || user.startsWith("[OCat]") || user == "Help") return;
+		if(user.startsWith("[DM] ")) user = user.substring(5);
+		if(user.startsWith("[OCat]") || user == "Help") return;
 		var el = document.createElement("li");
 		el.textContent = user;
 		ocat._userHistory[user] = {
@@ -1372,6 +1415,17 @@ ocat._hooks.updateUserData = (user, data) => {
 			lastActive: null,
 			element: el,
 		};
+		el.addEventListener("contextmenu", e => ocat._showContextMenu(e, [
+			{
+				user: e.target.textContent,
+				label: ocat.blockedUsers.has(e.target.textContent) ? "Unblock" : "Block",
+				action() {
+					if(!ocat.blockedUsers.delete(this.user)) {
+						ocat.blockedUsers.add(this.user);
+					}
+				}
+			}
+		]));
 		memberList.appendChild(el);
 	}
 	if("online" in data && ocat._userHistory[user].online != data.online) {
@@ -1502,7 +1556,7 @@ ocat._hooks.htmlMsg = (msg) => {
 	var ping = sandbox.content.querySelector(".ocat-user-ping-message");
 	if(namePrefix && /^(.*):\s*$/.test(namePrefix.textContent)) {
 		ocat._hooks.updateUserData(namePrefix.textContent.replace(/^(.*):\s*$/, "$1"), { active: true });
-		if(ocat.blockedUsers.includes(namePrefix.textContent.replace(/^(.*):\s*$/, "$1"))) {
+		if(ocat.blockedUsers.has(namePrefix.textContent.replace(/^(.*):\s*$/, "$1"))) {
 			namePrefix.classList.add("ocat-blocked");
 		}
 	} else if(!ping) {
@@ -1523,7 +1577,7 @@ patch("message",
 		if(ocat_messageContent.length > 1) {
 			ocat._hooks.updateUserData(ocat_messageContent[0], {active: true});
 			ocat_prefix = document.createElement("span");
-			if(ocat.blockedUsers.includes(ocat_messageContent[0])) ocat_prefix.classList.add('ocat-blocked');
+			if(ocat.blockedUsers.has(ocat_messageContent[0])) ocat_prefix.classList.add('ocat-blocked');
 			ocat_prefix.classList.add('ocat-left');
 			ocat_prefix.textContent = ocat_messageContent.shift() + ':';
 		}
@@ -1581,7 +1635,8 @@ function onKeyInput(e) {
 window.addEventListener("keydown", onKeyInput);
 window.addEventListener("keyup", onKeyInput);
 window.addEventListener("click", e => {
-	[...document.querySelectorAll(".ocat-active")].forEach(el => {
+	[...document.getElementsByClassName("ocat-active"),
+		...document.getElementsByClassName("ocat-context-menu")].forEach(el => {
 		el.classList.remove("ocat-active");
 	});
 });
