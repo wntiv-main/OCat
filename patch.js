@@ -1214,6 +1214,7 @@ themeSelector.addEventListener("click", e => {
 
 ocat._themes = [];
 const ocat_themeMap = {
+	"light-theme": "Light Mode",
 	"udark-theme": "Ultra Dark Mode",
 };
 const ocat_classMap = {
