@@ -395,7 +395,11 @@ var ocat = {
 		var settings = {};
 		for(var key in this) {
 			if(!key.startsWith("_")) {
-				settings[key] = ocat[key];
+				if(ocat[key] instanceof Set) {
+					settings[key] = [...ocat[key]];
+				} else {
+					settings[key] = ocat[key];
+				}
 			}
 		}
 		localStorage.setItem(this._SETTINGS_KEY, JSON.stringify(settings));
@@ -409,7 +413,14 @@ var ocat = {
 		img.style.height = 0;
 		socket.emit("html-message", img.outerHTML.replace(img.src, "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAA1JREFUGFdjYGBkZAAAAAoAAx9k7/gAAAAASUVORK5CYII="));
 	},
-	blockedUsers: new Set(),
+	_blockedUsers: new Set(),
+	get blockedUsers() {
+		return this._blockedUsers;
+	},
+	set blockedUsers(value) {
+		if(value instanceof Array) value = new Set(value);
+		this._blockedUsers = value;
+	},
 	_hooks: {},
 	_xssIds: {},
 	_userHistory: {},
