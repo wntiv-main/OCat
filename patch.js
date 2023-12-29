@@ -636,7 +636,7 @@ html, body {
 	padding: 0;
 	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 	background-size: cover;
-	ovarflow: hidden;
+	overflow: hidden;
 }
 
 body {
