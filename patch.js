@@ -565,7 +565,7 @@ socket.io.on("reconnect_failed", () => {
 });
 
 // Clear old content
-document.getElementById("message-container").innerHTML = "";
+document.getElementById("message-container").replaceChildren();
 
 var ocat_bannerContainer = document.createElement("div");
 ocat_bannerContainer.classList.add("ocat-banner-container");
