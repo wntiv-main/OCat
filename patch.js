@@ -1039,27 +1039,32 @@ document.head.appendChild(css);
 ocat._hooks.markdown = (name, msg) => {
 	var replacements = [
 		{
-			regex: /(?<!\\)\*{2}([^\*](?:.|\n)*)(?<!\\)\*{2}/g,
+			regex: /(?<!\\)\*{2}([^\*](?:.|\n)*?)(?<!\\)\*{2}/g,
 			element: "span",
 			attr: e => e.style.fontWeight = "bold"
 		},
 		{
-			regex: /(?<!\\)\*((?:.|\n)+)(?<!\\)\*/g,
+			regex: /(?<!\\)\*((?:.|\n)+?)(?<!\\)\*/g,
 			element: "span",
 			attr: e => e.style.fontStyle = "italic"
 		},
 		{
-			regex: /(?<!\\)_{2}([^_](?:.|\n)*)(?<!\\)_{2}/g,
+			regex: /(?<!\\)_{2}([^_](?:.|\n)*?)(?<!\\)_{2}/g,
 			element: "span",
 			attr: e => e.style.textDecoration = "underline"
 		},
 		{
-			regex: /(?<!\\)_((?:.|\n)+)(?<!\\)_/g,
+			regex: /(?<!\\)_((?:.|\n)+?)(?<!\\)_/g,
 			element: "span",
 			attr: e => e.style.fontStyle = "italic"
 		},
 		{
-			regex: /(?<!\\)`{3}([^`](?:.|\n)*)(?<!\\)`{3}/g,
+			regex: /(?<!\\)~{2}([^~](?:.|\n)*?)(?<!\\)~{2}/g,
+			element: "span",
+			attr: e => e.style.textDecoration = "strikethrough"
+		},
+		{
+			regex: /(?<!\\)`{3}([^`](?:.|\n)*?)(?<!\\)`{3}/g,
 			element: "pre",
 			attr: e => {
 				e.style.background = "#80808040";
@@ -1069,7 +1074,7 @@ ocat._hooks.markdown = (name, msg) => {
 			}
 		},
 		{
-			regex: /(?<!\\)`((?:.|\n)+)(?<!\\)`/g,
+			regex: /(?<!\\)`((?:.|\n)+?)(?<!\\)`/g,
 			element: "code",
 			attr: e => {
 				e.style.background = "#80808040";
