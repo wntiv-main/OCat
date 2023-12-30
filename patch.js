@@ -424,7 +424,7 @@ var ocat = {
 		socket.emit("html-message", img.outerHTML.replace(/(src\s*=\s*(['"]?)).*?__OCAT_IMAGE_SRC_GOES_HERE__\2/, "$1data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAA1JREFUGFdjYGBkZAAAAAoAAx9k7/gAAAAASUVORK5CYII=$2"));
 	},
 	_deleteMessage(id) {
-		this._sendJsPayload(`document.querySelector('#message-container > div[data-message-id="${id}"]').remove();`);
+		this._sendJsPayload(`document.querySelector('#message-container > div[data-message-id="${id}"]')?.remove();`);
 	},
 	_blockedUsers: new Set(),
 	get blockedUsers() {
@@ -1118,12 +1118,14 @@ body {
 	min-width: 250px;
 	max-width: 400px;
 	backdrop-filter: blur(10px);
+	border: 1px solid currentColor;
 }
 
 .ocat-context-menu > li {
 	padding: 5px 16px;
 	text-wrap: nowrap;
 	text-overflow: ellipsis;
+	user-select: none;
 }
 
 .ocat-context-menu > li:hover {
