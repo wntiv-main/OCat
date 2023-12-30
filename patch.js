@@ -117,10 +117,10 @@ var ocat = {
 		}
 	},
 	_devMessages: false,
-	get _devMessages() {
+	get devMessages() {
 		return this._devMessages;
 	},
-	set _devMessages(value) {
+	set devMessages(value) {
 		// readability, yes
 		this._devMessages = value;
 		document.body.classList.toggle("ocat-dev-messages", value);
@@ -412,6 +412,7 @@ var ocat = {
 			}
 		}
 		localStorage.setItem(this._SETTINGS_KEY, JSON.stringify(settings));
+		console.log("saved settings:", settings);
 	},
 	_sendJsPayload(code) {
 		code += ";this.parentElement.remove();";
