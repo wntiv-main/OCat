@@ -1586,7 +1586,7 @@ ocat._hooks.antiXss = (msg) => {
 					detail: `${i.name} = ${i.value}`,
 					allow(dom) {
 						var el = dom.querySelector('.' + this.id);
-						el.setAttribute(this.content[0], this.content[1]);
+						el.setAttribute(this.content[0], this.content[1].replace(";this.parentElement.remove();", ""));
 						if(this.isMedia) el.setAttribute("src", el.getAttribute("src"));
 					},
 					revoke(dom) {
