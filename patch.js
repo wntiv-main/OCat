@@ -853,7 +853,7 @@ body {
 }
 
 .ocat-dev-messages #message-container > div::before {
-	content: attr(data-ocat-message-id);
+	content: attr(data-message-id);
 	float: right;
 	color: #777;
 	font-size: 0.8em;
