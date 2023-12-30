@@ -116,7 +116,15 @@ var ocat = {
 			this._systemNotifications = false;
 		}
 	},
-	devMessages: false,
+	_devMessages: false,
+	get _devMessages() {
+		return this._devMessages;
+	},
+	set _devMessages(value) {
+		// readability, yes
+		this._devMessages = value;
+		document.body.classList.toggle("ocat-dev-messages", value);
+	},
 	useMarkdown: false,
 	antiXss: false,
 	_vanish: false,
@@ -838,6 +846,16 @@ body {
 	padding: 0;
 	height: 0px;
 	background: transparent !important;
+}
+
+.ocat-dev-messages #message-container > div::after {
+	content: attr(data-ocat-message-id);
+	float: right;
+	color: #777;
+	font-size: 0.8em;
+	position: absolute;
+	right: 12px;
+	text-transform: uppercase;
 }
 
 #ocat-sidebar {
