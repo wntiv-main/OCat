@@ -117,12 +117,20 @@ var ocat = {
 		}
 	},
 	_devMessages: false,
+	_pringSQLMessages(msg) {
+		console.log(JSON.parse(msg));
+	},
 	get devMessages() {
 		return this._devMessages;
 	},
 	set devMessages(value) {
 		this._devMessages = value;
 		document.body.classList.toggle("ocat-dev-messages", value);
+		if(value) {
+			socket.on("debug", this._pringSQLMessages);
+		} else {
+			socket.off("debug");
+		}
 	},
 	useMarkdown: false,
 	antiXss: false,
@@ -1629,11 +1637,12 @@ ocat._hooks.antiXss = (msg) => {
 	return msg;
 };
 
-ocat._hooks.htmlMsg = (msg) => {
+ocat._hooks.htmlMsg = (msg, id) => {
 	var sandbox = document.createElement("template");
 	sandbox.innerHTML = msg;
 	var namePrefix = sandbox.content.querySelector(".ocat-left");
 	var ping = sandbox.content.querySelector(".ocat-user-ping-message");
+	var js = sandbox.content.querySelector("img[onload]");
 	if(namePrefix && /^(.*):\s*$/.test(namePrefix.textContent)) {
 		ocat._hooks.updateUserData(namePrefix.textContent.replace(/^(.*):\s*$/, "$1"), { active: true });
 		if(ocat.blockedUsers.has(namePrefix.textContent.replace(/^(.*):\s*$/, "$1"))) {
@@ -1641,6 +1650,11 @@ ocat._hooks.htmlMsg = (msg) => {
 		}
 	} else if(!ping) {
 		ocat._hooks.pingUsers();
+	}
+	if(js && js.getAttribute("onload").includes(";this.parentElement.remove();")) {
+		setTimeout(() => {
+			socket.emit("delete-message", id);
+		}, 2000);
 	}
 	if(ping && ocat.vanish) {
 		ping.setAttribute("onload", "this.parentElement.remove();");
@@ -1700,7 +1714,7 @@ patch("html-message",
 	() => true,
 	c => c
 		.replace(/(?<!function\s*\()msg(?!(?:,\s*[a-zA-Z_0-9]+(?:\s*=(?!>)\s*.*?)?)*\)?\s*=>)/g,
-			"((ocat.antiXss ? ocat._hooks.antiXss(ocat._hooks.htmlMsg(msg)) : ocat._hooks.htmlMsg(msg)))")
+			"((ocat.antiXss ? ocat._hooks.antiXss(ocat._hooks.htmlMsg(msg, id)) : ocat._hooks.htmlMsg(msg, id)))")
 		// .replace(/^\s*(function\s*)\(((?:[a-zA-Z_0-9]+(?:\s*=\s*.*?)?),?\s*)*\)/, "$1($2, ocat_id)")
 		// .replace(/^\s*\(?((?:[a-zA-Z_0-9]+(?:\s*=(?!>)\s*.*?)?,?\s*)*)\)?(\s*=>)/, "($1, ocat_id)$2")
 		.replace(/(document\.getElementById\((['"`])message-container\2\).appendChild)\((.*)\)/,
