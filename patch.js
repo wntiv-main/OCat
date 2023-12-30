@@ -848,7 +848,7 @@ body {
 	background: transparent !important;
 }
 
-.ocat-dev-messages #message-container > div::after {
+.ocat-dev-messages #message-container > div::before {
 	content: attr(data-ocat-message-id);
 	float: right;
 	color: #777;
