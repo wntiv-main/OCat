@@ -1175,7 +1175,7 @@ ocat._hooks.markdown = (name, msg) => {
 		{
 			regex: /(?<!\\)~{2}([^~](?:.|\n)*?)(?<!\\)~{2}/g,
 			element: "span",
-			attr: e => e.style.textDecoration = "strikethrough"
+			attr: e => e.style.textDecoration = "line-through"
 		},
 		{
 			regex: /(?<!\\)`{3}([^`](?:.|\n)*?)(?<!\\)`{3}/g,
