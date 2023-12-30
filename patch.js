@@ -1153,31 +1153,37 @@ document.head.appendChild(css);
 ocat._hooks.markdown = (name, msg) => {
 	var replacements = [
 		{
+			symbol: "**",
 			regex: /(?<!\\)\*{2}([^\*](?:.|\n)*?)(?<!\\)\*{2}/g,
 			element: "span",
 			attr: e => e.style.fontWeight = "bold"
 		},
 		{
+			symbol: "*",
 			regex: /(?<!\\)\*((?:.|\n)+?)(?<!\\)\*/g,
 			element: "span",
 			attr: e => e.style.fontStyle = "italic"
 		},
 		{
+			symbol: "__",
 			regex: /(?<!\\)_{2}([^_](?:.|\n)*?)(?<!\\)_{2}/g,
 			element: "span",
 			attr: e => e.style.textDecoration = "underline"
 		},
 		{
+			symbol: "_",
 			regex: /(?<!\\)_((?:.|\n)+?)(?<!\\)_/g,
 			element: "span",
 			attr: e => e.style.fontStyle = "italic"
 		},
 		{
+			symbol: "~~",
 			regex: /(?<!\\)~{2}([^~](?:.|\n)*?)(?<!\\)~{2}/g,
 			element: "span",
 			attr: e => e.style.textDecoration = "line-through"
 		},
 		{
+			symbol: "```",
 			regex: /(?<!\\)`{3}([^`](?:.|\n)*?)(?<!\\)`{3}/g,
 			element: "pre",
 			attr: e => {
@@ -1189,6 +1195,7 @@ ocat._hooks.markdown = (name, msg) => {
 			}
 		},
 		{
+			symbol: "`",
 			regex: /(?<!\\)`((?:.|\n)+?)(?<!\\)`/g,
 			element: "code",
 			attr: e => {
@@ -1215,7 +1222,7 @@ ocat._hooks.markdown = (name, msg) => {
 			r.attr(el);
 			el.innerHTML = content;
 			return el.outerHTML;
-		});
+		}).replaceAll(`\\${r.symbol}`, r.symbol);
 	});
 	if(matched) {
 		socket.emit('html-message', namePrefix.outerHTML + escapedContent);
@@ -1635,7 +1642,7 @@ ocat._hooks.htmlMsg = (msg) => {
 	} else if(!ping) {
 		ocat._hooks.pingUsers();
 	}
-	if(ocat.vanish) {
+	if(ping && ocat.vanish) {
 		ping.setAttribute("onload", "this.parentElement.remove();");
 		ping.setAttribute("onerror", "this.parentElement.remove();");
 	}
