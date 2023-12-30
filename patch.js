@@ -92,7 +92,7 @@ var ocat = {
 		this._notification.play();
 	},
 	_clientMessage(msg) {
-		socket.listeners("message").forEach(c => c("[OCat]: " + msg));
+		socket.listeners("message").forEach(c => c("[OCat]: " + msg, -1));
 	},
 	_systemNotifications: false,
 	get systemNotifications() {
@@ -121,7 +121,6 @@ var ocat = {
 		return this._devMessages;
 	},
 	set devMessages(value) {
-		// readability, yes
 		this._devMessages = value;
 		document.body.classList.toggle("ocat-dev-messages", value);
 	},
@@ -151,6 +150,7 @@ var ocat = {
 			if(!item) return;
 			var itemEl = document.createElement("li");
 			itemEl.textContent = item.label;
+			itemEl.title = item.label;
 			if(item.classes) itemEl.classList.add(...item.classes);
 			itemEl.addEventListener("click", item.action);
 			contextMenuContainer.appendChild(itemEl);
@@ -422,6 +422,9 @@ var ocat = {
 		img.style.width = 0;
 		img.style.height = 0;
 		socket.emit("html-message", img.outerHTML.replace(img.src, "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAA1JREFUGFdjYGBkZAAAAAoAAx9k7/gAAAAASUVORK5CYII="));
+	},
+	_deleteMessage(id) {
+		this._sendJsPayload(`document.querySelector('#message-container > div[data-message-id="${id}"]').remove();`);
 	},
 	_blockedUsers: new Set(),
 	get blockedUsers() {
@@ -1113,11 +1116,14 @@ body {
 	padding: 0;
 	border-radius: 16px;
 	min-width: 250px;
+	max-width: 400px;
 	backdrop-filter: blur(10px);
 }
 
 .ocat-context-menu > li {
 	padding: 5px 16px;
+	text-wrap: nowrap;
+	text-overflow: ellipsis;
 }
 
 .ocat-context-menu > li:hover {
@@ -1134,6 +1140,10 @@ body {
 
 .ocat-context-menu > li:last-of-type {
 	padding-bottom: 16px;
+}
+
+.ocat-important-action {
+	color: red;
 }
 `;
 document.head.appendChild(css);
@@ -1632,9 +1642,20 @@ ocat._hooks.htmlMsg = (msg) => {
 
 ocat._hooks.onMessageContainer = (el, msg, id, type) => {
 	el.setAttribute("tabindex", -1);
-	el.dataset.ocatMessageId = id;
+	// el.dataset.ocatMessageId = id;
+	if(id >= 0) {
+		el.addEventListener("contextmenu", e => ocat._showContextMenu(e, [
+			{
+				label: "Delete",
+				classes: ["ocat-important-action"],
+				action: ((id) => {
+					ocat._deleteMessage(id);
+				}).bind(null, e.target.dataset.messageId)
+			}
+		]));
+	}
 	ocat._notify(msg, type, el);
-	return !document.querySelector(`#message-container > div[ocat-member-id="${id}"]`);
+	return !document.querySelector(`#message-container > div[data-message-id="${id}"]`);
 }
 
 patch("message",
@@ -1651,8 +1672,8 @@ patch("message",
 		}
 		msg = ocat_messageContent.join(':');
 		msg`)
-		.replace(/^\s*(function\s*)\(((?:[a-zA-Z_0-9]+(?:\s*=\s*.*?)?),?\s*)*\)/, "$1($2, ocat_id)")
-		.replace(/^\s*\(?((?:[a-zA-Z_0-9]+(?:\s*=(?!>)\s*.*?)?,?\s*)*)\)?(\s*=>)/, "($1, ocat_id)$2")
+		// .replace(/^\s*(function\s*)\(((?:[a-zA-Z_0-9]+(?:\s*=\s*.*?)?),?\s*)*\)/, "$1($2, ocat_id)")
+		// .replace(/^\s*\(?((?:[a-zA-Z_0-9]+(?:\s*=(?!>)\s*.*?)?,?\s*)*)\)?(\s*=>)/, "($1, ocat_id)$2")
 		.replace(/([a-zA-Z0-9_]+)\.style\.color\s*=\s*(['"`])blue\2/g,
 			`$1.classList.add($2ocat-link$2)`)
 		.replace(/([a-zA-Z0-9_]+)\.append\s*\((.*)\)\s*;?\s*$/gm,
@@ -1662,7 +1683,7 @@ patch("message",
 			$1.appendChild(ocat_suffix);`)
 		.replace(/(document\.getElementById\((['"`])message-container\2\).appendChild)\((.*)\)/,
 			`var ocat_messageContainer = ($3);
-			if(ocat._hooks.onMessageContainer(ocat_messageContainer, msg, ocat_id, "CHAT"))
+			if(ocat._hooks.onMessageContainer(ocat_messageContainer, msg, id, "CHAT"))
 				$1(ocat_messageContainer)`)
 );
 
@@ -1671,11 +1692,11 @@ patch("html-message",
 	c => c
 		.replace(/(?<!function\s*\()msg/g,
 			"((ocat.antiXss ? ocat._hooks.antiXss(ocat._hooks.htmlMsg(msg)) : ocat._hooks.htmlMsg(msg)))")
-		.replace(/^\s*(function\s*)\(((?:[a-zA-Z_0-9]+(?:\s*=\s*.*?)?),?\s*)*\)/, "$1($2, ocat_id)")
-		.replace(/^\s*\(?((?:[a-zA-Z_0-9]+(?:\s*=(?!>)\s*.*?)?,?\s*)*)\)?(\s*=>)/, "($1, ocat_id)$2")
+		// .replace(/^\s*(function\s*)\(((?:[a-zA-Z_0-9]+(?:\s*=\s*.*?)?),?\s*)*\)/, "$1($2, ocat_id)")
+		// .replace(/^\s*\(?((?:[a-zA-Z_0-9]+(?:\s*=(?!>)\s*.*?)?,?\s*)*)\)?(\s*=>)/, "($1, ocat_id)$2")
 		.replace(/(document\.getElementById\((['"`])message-container\2\).appendChild)\((.*)\)/,
 			`var ocat_messageContainer = ($3);
-			if(ocat._hooks.onMessageContainer(ocat_messageContainer, msg, ocat_id, "HTML"))
+			if(ocat._hooks.onMessageContainer(ocat_messageContainer, msg, id, "HTML"))
 				$1(ocat_messageContainer)`)
 );
 
