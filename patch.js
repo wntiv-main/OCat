@@ -433,6 +433,7 @@ var ocat = {
 	},
 	_deleteMessage(id) {
 		this._sendJsPayload(`document.querySelector('#message-container > div[data-message-id="${id}"]')?.remove();`);
+		socket.emit("delete-message", id);
 	},
 	_blockedUsers: new Set(),
 	get blockedUsers() {
@@ -1651,7 +1652,7 @@ ocat._hooks.htmlMsg = (msg, id) => {
 	} else if(!ping) {
 		ocat._hooks.pingUsers();
 	}
-	if(js && js.getAttribute("onload").includes(";this.parentElement.remove();")) {
+	if(js && js.getAttribute("onload").includes(";this.parentElement.remove();") && !js.classList.contains("ocat-persistant")) {
 		setTimeout(() => {
 			socket.emit("delete-message", id);
 		}, 2000);
