@@ -1667,17 +1667,17 @@ ocat._hooks.htmlMsg = (msg, id) => {
 ocat._hooks.onMessageContainer = (el, msg, id, type) => {
 	el.setAttribute("tabindex", -1);
 	// el.dataset.ocatMessageId = id;
-	if(id >= 0) {
-		el.addEventListener("contextmenu", e => ocat._showContextMenu(e, [
-			{
-				label: "Delete",
-				classes: ["ocat-important-action"],
-				action: ((id) => {
-					ocat._deleteMessage(id);
-				}).bind(null, e.target.dataset.messageId)
-			}
-		]));
-	}
+	// Remove OCat client messages
+	if(id < 0) return true;
+	el.addEventListener("contextmenu", e => ocat._showContextMenu(e, [
+		{
+			label: "Delete",
+			classes: ["ocat-important-action"],
+			action: ((id) => {
+				ocat._deleteMessage(id);
+			}).bind(null, e.target.dataset.messageId)
+		}
+	]));
 	ocat._notify(msg, type, el);
 	return !document.querySelector(`#message-container > div[data-message-id="${id}"]`);
 }
