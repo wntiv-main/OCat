@@ -439,7 +439,7 @@ var ocat = {
 		socket.emit("delete-message", id);
 	},
 	_editMessage(id, content) {
-		this._sendJsPayload(`(document.querySelector('#message-container > div[data-message-id="${id}"]') || {}).innerHTML = ${JSON.stringify(content)};`);
+		this._sendJsPayload(`(document.querySelector('#message-container > div[data-message-id="${id}"]') || {}).innerHTML = ${JSON.stringify(content)};`, true);
 	},
 	_blockedUsers: new Set(),
 	get blockedUsers() {
