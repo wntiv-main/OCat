@@ -786,6 +786,22 @@ body {
 	box-shadow: inset yellow 0px 0px 8px 0px, yellow 0px 0px 8px 0px;
 }
 
+#typing-users {
+	position: static;
+	padding: 0 8px 5px 8px;
+	font-size: 0.8em;
+	color: #777;
+	min-height: 1em;
+	transition: min-height 0.3s ease, height 0.3s ease, padding-bottom 0.3s ease;
+	overflow: hidden;
+}
+
+#typing-users.ocat-hidden {
+	min-height: 0;
+	height: 0;
+	padding-bottom: 0;
+}
+
 #ocat-input-wrapper {
 	flex-grow: 1;
 	background: transparent;
@@ -1309,8 +1325,9 @@ messageInput.addEventListener("keypress", e => {
 messageContainer.appendChild(messageInput);
 inputWrapper.appendChild(messageContainer);
 inputWrapper.appendChild(document.getElementById("typing-users"));
+document.getElementById("typing-users").classList.toggle("ocat-hidden", !typingUsers.size);
 socket.on("typing", (user, typing) => {
-
+	document.getElementById("typing-users").classList.toggle("ocat-hidden", !typingUsers.size);
 });
 messageToolbar.appendChild(inputWrapper);
 
