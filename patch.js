@@ -1678,7 +1678,7 @@ ocat._hooks.onMessageContainer = (el, msg, id, type) => {
 		{
 			label: "Edit",
 			action: ((el) => {
-				el.setAttribute("contenteditable");
+				el.setAttribute("contenteditable", true);
 				el.addEventListener("keypress", e => {
 					if(e.key == "Enter" && !(e.ctrlKey || e.shiftKey)) {
 						el.removeAttribute("contenteditable");
