@@ -332,6 +332,7 @@ var ocat = {
 				img.src = this._themeUrl;
 			});
 		} else {
+			localStorage.theme = value;
 			document.body.classList.add(value);
 			if(this._isLight(window.getComputedStyle(document.body).color)) {
 				// Light text, dark mode
