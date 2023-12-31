@@ -1324,10 +1324,12 @@ messageInput.addEventListener("keypress", e => {
 });
 messageContainer.appendChild(messageInput);
 inputWrapper.appendChild(messageContainer);
-inputWrapper.appendChild(document.getElementById("typing-users"));
-document.getElementById("typing-users").classList.toggle("ocat-hidden", !typingUsers.size);
-socket.on("typing", (user, typing) => {
-	document.getElementById("typing-users").classList.toggle("ocat-hidden", !typingUsers.size);
+
+var typingIndicator = document.getElementById("typing-users");
+inputWrapper.appendChild(typingIndicator);
+typingIndicator.classList.toggle("ocat-hidden", !typingUsers.size);
+socket.on("typing", function(user, typing) {
+	typingIndicator.classList.toggle("ocat-hidden", !typingUsers.size);
 });
 messageToolbar.appendChild(inputWrapper);
 
