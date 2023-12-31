@@ -784,8 +784,11 @@ body {
 	box-shadow: inset yellow 0px 0px 8px 0px, yellow 0px 0px 8px 0px;
 }
 
-.ocat-grow-wrap:has(> #message-input) {
+#ocat-input-wrapper {
 	flex-grow: 1;
+	background: transparent;
+	border-radius: 10px;
+	overflow: hidden;
 }
 
 .ocat-grow-wrap > #message-input,
@@ -804,6 +807,12 @@ body {
 	box-sizing: border-box;
 	overflow-wrap: anywhere;
 	scrollbar-gutter: stable;
+	box-shadow: 0 0 0 100vh #e0e0e0;
+}
+
+.ocat-dark-style .ocat-grow-wrap > #message-input,
+.ocat-dark-style .ocat-grow-wrap:has(> #message-input)::after {
+	box-shadow: 0 0 0 100vh #202020;
 }
 
 body {
