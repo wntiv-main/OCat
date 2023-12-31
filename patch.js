@@ -1308,7 +1308,7 @@ messageInput.addEventListener("input", e => {
 });
 messageInput.addEventListener("keypress", e => {
 	if(!ocat.silentTyping) {
-		socket.emit("typing", username, e.target.value);
+		socket.emit("typing", username, true);
 		clearTimeout(typingIdle);
 		typingIdle = setTimeout(() => socket.emit("typing", username, false), 3e3);
 	}
