@@ -145,7 +145,7 @@ var ocat = {
 		if(this._vanish = value) {
 			socket.emit("message", `${username} left the chat`);
 		} else {
-			socket.emit("message", `${username} joined the chat`);
+			socket.emit("message", `${username} Joined The Chat.`);
 		}
 		(this._hooks.pingUsers || (() => { }))();
 	},
