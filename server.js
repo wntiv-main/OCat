@@ -78,6 +78,11 @@ con.connect(function(err) {
 				next();
 				return;
 			}
+			if(["typing"].includes(event)) {
+				io.emit(event, ...args);
+				next();
+				return;
+			}
 			var sql = "INSERT INTO messages (channel, message) VALUES ?";
 			var values = [[event, args[0] || '']];
 			con.query(sql, [values], function(err, result) {

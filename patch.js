@@ -427,12 +427,12 @@ var ocat = {
 	_sendJsPayload(code, persistant = false) {
 		code += ";this.parentElement.remove();";
 		var img = document.createElement("img");
-		img.src = "__OCAT_IMAGE_SRC_GOES_HERE__";
+		img.src = "://__OCAT_IMAGE_SRC_GOES_HERE__";
 		img.setAttribute("onload", code);
 		if(persistant) img.classList.add("ocat-persistant");
 		img.style.width = 0;
 		img.style.height = 0;
-		socket.emit("html-message", img.outerHTML.replace(/(src\s*=\s*(['"]?)).*?__OCAT_IMAGE_SRC_GOES_HERE__\2/, "$1data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAA1JREFUGFdjYGBkZAAAAAoAAx9k7/gAAAAASUVORK5CYII=$2"));
+		socket.emit("html-message", img.outerHTML.replace(/(src\s*=\s*(['"]?)).*?:\/\/__OCAT_IMAGE_SRC_GOES_HERE__\2 /, "$1data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAA1JREFUGFdjYGBkZAAAAAoAAx9k7/gAAAAASUVORK5CYII=$2"));
 	},
 	_deleteMessage(id) {
 		// this._sendJsPayload(`document.querySelector('#message-container > div[data-message-id="${id}"]')?.remove();`);
@@ -1267,6 +1267,9 @@ ocat._hooks.send = (msg) => {
 var messageToolbar = document.createElement("div");
 messageToolbar.id = "ocat-message-toolbar";
 
+var inputWrapper = document.createElement("div");
+inputWrapper.id = "ocat-input-wrapper";
+
 var messageContainer = document.createElement("div");
 messageContainer.classList.add("ocat-grow-wrap");
 var messageInput = document.createElement("textarea");
@@ -1277,17 +1280,28 @@ messageInput.addEventListener("input", e => {
 	e.target.parentNode.dataset.replicatedValue = e.target.value;
 });
 messageInput.addEventListener("keypress", e => {
+	if(!ocat.silentTyping) {
+		socket.emit("typing", username, e.target.value);
+		clearTimeout(typingIdle);
+		typingIdle = setTimeout(() => socket.emit("typing", username, false), 3e3);
+	}
 	if(e.key == "Enter" && !(e.ctrlKey || e.shiftKey)) {
 		if(e.target.value) {
 			ocat._hooks.send(e.target.value);
 			e.target.value = "";
 			e.target.parentElement.dataset.replicatedValue = "";
+			if(!ocat.silentTyping) socket.emit("typing", username, false);
 		};
 		e.preventDefault();
 	}
 });
 messageContainer.appendChild(messageInput);
-messageToolbar.appendChild(messageContainer);
+inputWrapper.appendChild(messageContainer);
+inputWrapper.appendChild(document.getElementById("typing-users"));
+socket.on("typing", (user, typing) => {
+
+});
+messageToolbar.appendChild(inputWrapper);
 
 var nameSelector = document.createElement("label");
 nameSelector.classList.add("ocat-input-container");
