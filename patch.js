@@ -135,6 +135,7 @@ var ocat = {
 	},
 	useMarkdown: false,
 	antiXss: false,
+	silentTyping: false,
 	_vanish: false,
 	get vanish() {
 		return this._vanish;
@@ -656,6 +657,7 @@ addToggleSettingCommand("systemNotifications", "Toggles sending system notificat
 addStringSettingCommand("theme", "Sets the theme.", s => `Switched to ${s}`);
 addToggleSettingCommand("useMarkdown", "Allows use of markdown in chat messages.", b => `${b ? "Enabled" : "Disabled"} markdown parser`);
 addToggleSettingCommand("antiXss", "Remove XSS payloads.", b => `${b ? "Now" : "No longer"} checking payloads for XSS.`, true);
+addToggleSettingCommand("silentTyping", "Do not show users that you are typing.", b => `${b ? "Now" : "No longer"} silently typing.`);
 addToggleSettingCommand("vanish", "Dissappear from chat.", b => `${b ? "Now" : "No longer"} vanished.`, true);
 addStringSettingCommand("notificationSound", "Set the notification sound by URL.", s => `Set notification sound to ${s}.`);
 addToggleSettingCommand("devMessages", "Verbose messages intended for OCat developers.", b => `${b ? "Now" : "No longer"} showing verbose developer messages.`, true);
