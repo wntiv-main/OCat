@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <base target="_blank">
+    <title>CCat</title>
+    <meta content="CCat" property="og:title" />
+    <meta content="Be nice to people." property="og:description" />
+    <meta content="https://relaxing-only-beagle.ngrok-free.app" property="og:url" />
+    <meta content="https://relaxing-only-beagle.ngrok-free.app/images/DTACat.png" property="og:image" />
+    <meta content="#43B581" data-react-helmet="true" name="theme-color" />
+    <link rel="icon" type="image/x-icon" href="https://relaxing-only-beagle.ngrok-free.app/favicon.ico">
+    <style>
+        body {
+            background-color: #333538;
+            color: white;
+        }
+
+        #message-input {
+            width: 100%;
+            position: fixed;
+            bottom: 0;
+        }
+
+        #message-container {
+            padding-bottom: 1em;
+        }
+
+        .lightmode {
+            background-color: white;
+            color: black;
+            right: 0px;
+        }
+
+        .darkmode {
+            background-color: #333538;
+            /* or whatever */
+            color: white;
+        }
+
+        .ultradarkmode {
+            background-color: black;
+            color: white;
+        }
+
+        .bluetheme {
+            background-image: linear-gradient(to right, rgba(0, 0, 133, 1), rgba(0, 0, 255, 1));
+            color: white;
+        }
+
+        .redtheme {
+            background-image: linear-gradient(to right, rgba(133, 0, 0, 1), rgba(255, 0, 0, 1));
+            color: white;
+        }
+
+        .yellowtheme {
+            background-image: linear-gradient(to right, rgba(133, 133, 0, 1), rgba(255, 255, 0, 1));
+            color: black;
+        }
+
+        .greentheme {
+            background-image: linear-gradient(to right, rgba(13, 112, 0, 1), rgba(30, 255, 0, 1));
+            color: white;
+        }
+
+        .rainbowtheme {
+            background-image: linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet);
+            color: black;
+        }
+
+        .minecraftthemeone {
+            background-image: url(../images/minecraft1.png);
+            color: white;
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-attachment: fixed;
+        }
+
+        .minecraftthemetwo {
+            background-image: url(../images/2023-07-31_14.29.07.png);
+            color: white;
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-attachment: fixed;
+        }
+
+        .minecraftthemethree {
+            background-image: url(../images/2023-07-31_14.29.35.png);
+            color: white;
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-attachment: fixed;
+        }
+
+        .minecraftthemefour {
+            background-image: url(../images/2023-09-05_16.46.27.png);
+            color: black;
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-attachment: fixed;
+        }
+
+        .geometrydashthemeone {
+            background-image: url(../images/redGD.png);
+            color: white;
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-attachment: fixed;
+        }
+
+        .geometrydashthemetwo {
+            background-image: url(../images/1500x500.jpeg);
+            color: white;
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-attachment: fixed;
+        }
+
+        .teardownthemeone {
+            background-image: url(../images/1700440382_new_2023-11-20-03-31-31.png);
+            color: white;
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-attachment: fixed;
+        }
+
+        .sidebar {
+            position: fixed;
+            width: 25%;
+            backdrop-filter: blur(10px);
+        }
+
+        .right {
+            right: 0px;
+            top: 0px;
+        }
+
+        .button {
+            cursor: pointer;
+            border: none;
+            width: 80px;
+            height: 80px;
+            border: solid;
+            border-color: aquamarine;
+        }
+
+        .ultradarkmode1 {
+            background-color: black;
+        }
+
+        .darkmode1 {
+            background-color: #333538;
+        }
+
+        .bluetheme1 {
+            background-color: blue;
+        }
+
+        .redtheme1 {
+            background-color: red;
+        }
+
+        .yellowtheme1 {
+            background-color: yellow;
+        }
+
+        .greentheme1 {
+            background-color: green;
+        }
+
+        .rainbowtheme1 {
+            background-image: linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet);
+        }
+
+        .mctheme1 {
+            background-image: url(../images/minecraft1.png);
+            background-size: cover;
+        }
+
+        .mctheme2 {
+            background-image: url(../images/2023-07-31_14.29.07.png);
+            background-size: cover;
+        }
+
+        .mctheme3 {
+            background-image: url(../images/2023-07-31_14.29.35.png);
+            background-size: cover;
+        }
+
+        .mctheme4 {
+            background-image: url(../images/2023-09-05_16.46.27.png);
+            background-size: cover;
+        }
+
+        .gdtheme1 {
+            background-image: url(../images/redGD.png);
+            background-size: cover;
+        }
+
+        .teartheme1 {
+            background-image: url(../images/1700440382_new_2023-11-20-03-31-31.png);
+            background-size: cover;
+        }
+    </style>
+    <script src="./js/socket.io.js"></script>
+</head>
+
+<body>
+    <h1>Welcome To CCat</h1>
+
+    <p>Be nice to people</p>
+
+    <div class="right sidebar">
+        <h1>User Settings</h1>
+        <p>(Beta)</p>
+
+        <p>Change Username</p>
+
+        <input id="name-selector" />
+
+
+        <h1>Theme Settings</h1>
+        <p>(Beta)</p>
+
+
+        <p>Basic Themes</p>
+
+        <button class="button" id="light-theme"> </button>
+
+        <button class="button darkmode1" id="dark-theme"> </button>
+
+        <button class="button ultradarkmode1" id="udark-theme"> </button>
+
+
+        <p>Colored Themes</p>
+        <!-- blue -->
+        <button class="button bluetheme1" id="blue-theme"> </button>
+        <!-- red -->
+        <button class="button redtheme1" id="red-theme"> </button>
+        <!-- yellow -->
+        <button class="button yellowtheme1" id="yellow-theme"> </button>
+        <!-- green -->
+        <button class="button greentheme1" id="green-theme"> </button>
+        <!-- rainbow -->
+        <button class="button rainbowtheme1" id="rainbow-theme"> </button>
+
+
+        <p>Image Themes</p>
+
+        <!-- minecraft1 -->
+        <button class="button mctheme1" id="minecraft-theme-one"> </button>
+
+        <!-- minecraft2 -->
+        <button class="button mctheme2" id="minecraft-theme-two"> </button>
+
+        <!-- minecraft3 -->
+        <button class="button mctheme3" id="minecraft-theme-three"> </button>
+
+        <!-- minecraft4 -->
+        <button class="button mctheme4" id="minecraft-theme-four"> </button>
+
+        <!-- gdash1 -->
+        <button class="button gdtheme1" id="geometry-dash-theme-one"> </button>
+
+        <!-- gdash2 -->
+        <!-- <button id="geometry-dash-theme-two">Geometry Dash Theme 2</button> -->
+        <!-- gdash1 -->
+        <button class="button teartheme1" id="teardown-theme-one"> </button>
+
+    </div>
+
+    <div id="message-container">
+    </div>
+    <input id="message-input" />
+    <script>
+        if (!("username" in localStorage)) {
+            localStorage.username = prompt("Enter your username:");
+        }
+        var username = localStorage.username;
+        document.getElementById("name-selector").value = username;
+
+        const socket = io();
+        socket.on('message', console.log);
+        socket.on("message", (msg, id) => {
+            var finalContent = [];
+            msg.split(" ").forEach((v, i) => {
+                if (i) {
+                    if (typeof (finalContent[0]) == "string") {
+                        finalContent[0] += " ";
+                    } else finalContent.unshift(" ");
+                }
+                // https://stackoverflow.com/a/3809435
+                if (/(http(s)?:\/\/.)(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/g.test(v)) {
+                    var el = document.createElement("a");
+                    el.href = v;
+                    el.textContent = v;
+                    el.style.textDecoration = "underline";
+                    el.style.color = "blue";
+                    el.style.cursor = "pointer";
+                    finalContent.unshift(el);
+                } else {
+                    if (i) {
+                        finalContent[0] += v;
+                    } else finalContent.unshift(v);
+                }
+            });
+            var item = document.createElement('div');
+            item.append(...(finalContent.reverse()));
+            item.dataset.messageId = id;
+            document.getElementById("message-container").appendChild(item);
+            window.scrollTo(0, document.body.scrollHeight);
+        });
+        document.getElementById("message-input").addEventListener("change", e => {
+            if (e.target.value == "/help") {
+                socket.listeners("message").forEach(c => c(
+                    `Help: /help: Show this menu.`));
+                e.target.value = "";
+                return;
+            }
+            socket.emit("message", `${username}: ${e.target.value}`);
+            e.target.value = "";
+        });
+        //gray
+        document.getElementById("dark-theme").addEventListener("click", e => {
+            document.body.className = "darkmode";
+        });
+        //black
+        document.getElementById("udark-theme").addEventListener("click", e => {
+            document.body.className = "ultradarkmode";
+        });
+        //white
+        document.getElementById("light-theme").addEventListener("click", e => {
+            document.body.className = "lightmode";
+        });
+        //blue
+        document.getElementById("blue-theme").addEventListener("click", e => {
+            document.body.className = "bluetheme";
+        });
+        //red
+        document.getElementById("red-theme").addEventListener("click", e => {
+            document.body.className = "redtheme";
+        });
+        //yellow
+        document.getElementById("yellow-theme").addEventListener("click", e => {
+            document.body.className = "yellowtheme";
+        });
+        //green
+        document.getElementById("green-theme").addEventListener("click", e => {
+            document.body.className = "greentheme";
+        });
+        //rainbow
+        document.getElementById("rainbow-theme").addEventListener("click", e => {
+            document.body.className = "rainbowtheme";
+        });
+        //minecraft image 1
+        document.getElementById("minecraft-theme-one").addEventListener("click", e => {
+            document.body.className = "minecraftthemeone";
+        });
+        //minecraft image 2
+        document.getElementById("minecraft-theme-two").addEventListener("click", e => {
+            document.body.className = "minecraftthemetwo";
+        });
+        //minecraft image 3
+        document.getElementById("minecraft-theme-three").addEventListener("click", e => {
+            document.body.className = "minecraftthemethree";
+        });
+        //minecraft image 4
+        document.getElementById("minecraft-theme-four").addEventListener("click", e => {
+            document.body.className = "minecraftthemefour";
+        });
+        //gdash image 1
+        document.getElementById("geometry-dash-theme-one").addEventListener("click", e => {
+            document.body.className = "geometrydashthemeone";
+        });
+        //gdash image 2
+        //document.getElementById("geometry-dash-theme-two").addEventListener("click", e => {
+        //    document.body.className = "geometrydashthemetwo";
+        //});
+        //teardown image 1
+        document.getElementById("teardown-theme-one").addEventListener("click", e => {
+            document.body.className = "teardownthemeone";
+        });
+
+        socket.on('html-message', function (msg, id) {
+            var item = document.createElement('div');
+            item.innerHTML = msg;
+            item.dataset.messageId = id;
+            document.getElementById("message-container").appendChild(item);
+            window.scrollTo(0, document.body.scrollHeight);
+        });
+        //name selector
+        document.getElementById("name-selector").addEventListener("change", e => {
+            username = e.target.value;
+            localStorage.username = username;
+        });
+        //leave messages
+        window.addEventListener("beforeunload", e => {
+            socket.emit("message", username + " left the chat");
+        });
+        window.alert = msg => { }
+
+        socket.emit("message-history");
+        socket.emit('message', `${username} Joined The Chat.`);
+    </script>
+</body>
+
+</html>

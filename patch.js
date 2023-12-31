@@ -1,7 +1,7 @@
 if(!!ocat) throw new Error("Already Injected");
 
 var ocat = {
-	_LAST_SEEN_CCAT_HASH: 47865244,
+	_LAST_SEEN_CCAT_HASH: 1545145886,
 	_notification: new Audio(),
 	_currentNotification: null,
 	_currentBannerColor: "transparent",
@@ -432,7 +432,7 @@ var ocat = {
 		socket.emit("html-message", img.outerHTML.replace(/(src\s*=\s*(['"]?)).*?__OCAT_IMAGE_SRC_GOES_HERE__\2/, "$1data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAA1JREFUGFdjYGBkZAAAAAoAAx9k7/gAAAAASUVORK5CYII=$2"));
 	},
 	_deleteMessage(id) {
-		this._sendJsPayload(`document.querySelector('#message-container > div[data-message-id="${id}"]')?.remove();`);
+		// this._sendJsPayload(`document.querySelector('#message-container > div[data-message-id="${id}"]')?.remove();`);
 		socket.emit("delete-message", id);
 	},
 	_blockedUsers: new Set(),
@@ -1732,7 +1732,8 @@ patch("html-message",
 	});
 });
 
-socket.on("pongUser", user => {
+socket.on("pongUser", (user, id) => {
+	socket.emit("delete-message", id);
 	if(user)
 		ocat._hooks.updateUserData(user, { online: true });
 });
