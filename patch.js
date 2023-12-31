@@ -1,7 +1,7 @@
 if(!!ocat) throw new Error("Already Injected");
 
 var ocat = {
-	_LAST_SEEN_CCAT_HASH: 1545145886,
+	_LAST_SEEN_CCAT_HASH: -1450177096,
 	_START_TIME: Date.now(),
 	_notification: new Audio(),
 	_currentNotification: null,
@@ -438,6 +438,9 @@ var ocat = {
 		// this._sendJsPayload(`document.querySelector('#message-container > div[data-message-id="${id}"]')?.remove();`);
 		socket.emit("delete-message", id);
 	},
+	_editMessage(id, content) {
+		this._sendJsPayload(`(document.querySelector('#message-container > div[data-message-id="${id}"]') || {}).innerHTML = ${JSON.stringify(content)};`);
+	},
 	_blockedUsers: new Set(),
 	get blockedUsers() {
 		return this._blockedUsers;
@@ -499,7 +502,7 @@ var ocat = {
 						.replace(/"/g, `'+String.fromCharCode(${'"'.charCodeAt(0)})+'`);
 				}
 				ocat._sendJsPayload(`if(username=='${target}'){socket.listeners('message').forEach(c=>c('[DM] ${escape(username)} -> ${escape(target)}: ${escape(args.join(" "))}'));socket.emit("delete-message", this.parentElement.dataset.messageId)}`, true);
-				socket.listeners('message').forEach(c => c(`[DM] ${escape(username)} -> ${escape(target)}: ${escape(args.join(" "))}`))
+				socket.listeners('message').forEach(c => c(`[DM] ${username} -> ${target}: ${args.join(" ")}`))
 			},
 			description: () => "Send a private message to the specified user."
 		},
@@ -1672,6 +1675,19 @@ ocat._hooks.onMessageContainer = (el, msg, id, type) => {
 	// Remove OCat client messages
 	if(id < 0) return true;
 	el.addEventListener("contextmenu", e => ocat._showContextMenu(e, [
+		{
+			label: "Edit",
+			action: ((el) => {
+				el.setAttribute("contenteditable");
+				el.addEventListener("keypress", e => {
+					if(e.key == "Enter" && !(e.ctrlKey || e.shiftKey)) {
+						el.removeAttribute("contenteditable");
+						ocat._editMessage(e.target.dataset.messageId, el.innerHTML);
+						e.preventDefault();
+					}
+				});
+			}).bind(null, e.target)
+		},
 		{
 			label: "Delete",
 			classes: ["ocat-important-action"],
