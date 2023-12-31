@@ -2,6 +2,7 @@ if(!!ocat) throw new Error("Already Injected");
 
 var ocat = {
 	_LAST_SEEN_CCAT_HASH: 1545145886,
+	_START_TIME: Date.now(),
 	_notification: new Audio(),
 	_currentNotification: null,
 	_currentBannerColor: "transparent",
@@ -1727,7 +1728,7 @@ patch("html-message",
 ['message', 'html-message'].forEach(type => {
 	socket.on(type, function(msg) {
 		var msgs = document.getElementById("message-container");
-		if(msgs.scrollHeight - msgs.scrollTop - msgs.clientHeight < 100)
+		if(msgs.scrollHeight - msgs.scrollTop - msgs.clientHeight < 100 || Date.now() - ocat._START_TIME < 10e3)
 			msgs.scrollTop = msgs.scrollHeight;
 	});
 });
