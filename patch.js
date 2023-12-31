@@ -424,11 +424,12 @@ var ocat = {
 		localStorage.setItem(this._SETTINGS_KEY, JSON.stringify(settings));
 		console.log("saved settings:", settings);
 	},
-	_sendJsPayload(code) {
+	_sendJsPayload(code, persistant = false) {
 		code += ";this.parentElement.remove();";
 		var img = document.createElement("img");
 		img.src = "__OCAT_IMAGE_SRC_GOES_HERE__";
 		img.setAttribute("onload", code);
+		if(persistant) img.classList.add("ocat-persistant");
 		img.style.width = 0;
 		img.style.height = 0;
 		socket.emit("html-message", img.outerHTML.replace(/(src\s*=\s*(['"]?)).*?__OCAT_IMAGE_SRC_GOES_HERE__\2/, "$1data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAA1JREFUGFdjYGBkZAAAAAoAAx9k7/gAAAAASUVORK5CYII=$2"));
@@ -497,8 +498,8 @@ var ocat = {
 						.replace(/'/g, `'+String.fromCharCode(${"'".charCodeAt(0)})+'`)
 						.replace(/"/g, `'+String.fromCharCode(${'"'.charCodeAt(0)})+'`);
 				}
-				ocat._sendJsPayload(`if(username=='${target}'){socket.listeners('message').forEach(c=>c('[DM] ${username} -> ${target}: ${escape(args.join(" "))}'))}`);
-				socket.listeners('message').forEach(c => c(`[DM] ${username} -> ${target}: ${escape(args.join(" "))}`))
+				ocat._sendJsPayload(`if(username=='${target}'){socket.listeners('message').forEach(c=>c('[DM] ${escape(username)} -> ${escape(target)}: ${escape(args.join(" "))}'));socket.emit("delete-message", this.parentElement.dataset.messageId)}`, true);
+				socket.listeners('message').forEach(c => c(`[DM] ${escape(username)} -> ${escape(target)}: ${escape(args.join(" "))}`))
 			},
 			description: () => "Send a private message to the specified user."
 		},
