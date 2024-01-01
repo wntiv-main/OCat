@@ -64,27 +64,28 @@ var ocat = {
 		});
 		img.src = favicon;
 	},
-	_faviconCanvas: new OffscreenCanvas(32, 32),
-	_faviconContext: this._faviconCanvas.getContext('2d', {
+	_faviconCanvas: new OffscreenCanvas(32, 32).getContext('2d', {
 		willReadFrequently: true
 	}),
 	_faviconUrl: null,
 	_unreads: 0,
 	_updateFavicon() {
 		this._getFavicon(img => {
-			this._faviconContext.clearRect(0, 0, 32, 32);
-			this._faviconContext.drawImage(img, 0, 0, 32, 32);
+			var w = this._faviconCanvas.canvas.width;
+			var h = this._faviconCanvas.canvas.height;
+			this._faviconCanvas.clearRect(0, 0, w, h);
+			this._faviconCanvas.drawImage(img, 0, 0, w, h);
 			if(this._unreads) {
-				this._faviconContext.fillStyle = "#ff0000";
-				this._faviconContext.arc(24, 24, 8, 0, Math.PI * 2);
-				this._faviconContext.fill();
-				this._faviconContext.font = "12px sans-serif";
-				this._faviconContext.textAlign = "center";
-				this._faviconContext.textBaseline = "middle";
-				this._faviconContext.fillStyle = "#ffffff";
-				this._faviconContext.fillText(`${this._unreads < 9 ? this._unreads : "9+"}`, 24, 25);
+				this._faviconCanvas.fillStyle = "#ff0000";
+				this._faviconCanvas.arc(w * 3 / 4, h * 3 / 4, (w + h) / 2 / 4, 0, Math.PI * 2);
+				this._faviconCanvas.fill();
+				this._faviconCanvas.font = `${(w + h) / 2 / 2 * 3 / 4}px sans-serif`;
+				this._faviconCanvas.textAlign = "center";
+				this._faviconCanvas.textBaseline = "middle";
+				this._faviconCanvas.fillStyle = "#ffffff";
+				this._faviconCanvas.fillText(`${this._unreads < 9 ? this._unreads : "9+"}`, w * 3 / 4, h * 3 / 4 + 1);
 			}
-			this._faviconCanvas.convertToBlob().then(blob => {
+			this._faviconCanvas.canvas.convertToBlob().then(blob => {
 				if(this._faviconUrl) URL.revokeObjectURL(this._faviconUrl);
 				this._faviconUrl = URL.createObjectURL(blob);
 				var link = document.querySelector("link[rel~='icon']");
