@@ -53,7 +53,7 @@ var ocat = {
 		var favicon = "/favicon.ico";
 		var nodeList = document.getElementsByTagName("link");
 		for(var i = 0; i < nodeList.length; i++) {
-			if(nodeList[i].getAttribute("rel").includes(icon)) {
+			if(nodeList[i].getAttribute("rel").includes("icon")) {
 				favicon = nodeList[i].href;
 			}
 		}
