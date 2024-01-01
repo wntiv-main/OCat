@@ -1849,14 +1849,14 @@ ocat._hooks.onMessageContainer = (el, msg, id, type) => {
 patch("message",
 	c => c.toString().includes("finalContent"),
 	c => c.replace(/(?<!function\s*\()msg(?!(?:,\s*[a-zA-Z_0-9]+(?:\s*=(?!>)\s*.*?)?)*\)?\s*=>)/, `
-		var ocat_messageContent = msg.split(/: |\n/g, 2);
+		var ocat_messageContent = msg.split(/(: )|\n/g, 2);
 		var ocat_prefix = null;
 		if(ocat_messageContent.length > 1) {
 			ocat._hooks.updateUserData(ocat_messageContent[0], {active: true});
 			ocat_prefix = document.createElement("span");
 			if(ocat.blockedUsers.has(ocat_messageContent[0])) ocat_prefix.classList.add('ocat-blocked');
 			ocat_prefix.classList.add('ocat-left');
-			ocat_prefix.textContent = ocat_messageContent.shift() + ocat._USER_SEPERATOR;
+			ocat_prefix.textContent = ocat_messageContent[0] + ocat._USER_SEPERATOR;
 			msg = msg.substring(ocat_messageContent[0].length + ocat._USER_SEPERATOR.length);
 		}
 		msg`)
