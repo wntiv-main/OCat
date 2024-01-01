@@ -841,6 +841,11 @@ body {
 	grid-area: 1 / 1 / 2 / 2;
 }
 
+#message-container > div {
+	border: none;
+	width: 100%;
+}
+
 #message-container > div:not(.ocat-banner-container) {
 	max-width: 100%;
 	overflow-x: auto;
