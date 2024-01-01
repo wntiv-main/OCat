@@ -1372,7 +1372,7 @@ ocat._hooks.markdown = (name, msg) => {
 	sandbox.textContent = msg;
 
 	var namePrefix = document.createElement("span");
-	namePrefix.textContent = `${name}${ocat._USER_SEPERATOR}`;
+	namePrefix.textContent = `${name}`;
 	namePrefix.classList.add('ocat-left');
 
 	var escapedContent = sandbox.outerHTML;
@@ -1875,7 +1875,7 @@ patch("message",
 			ocat_prefix = document.createElement("span");
 			if(ocat.blockedUsers.has(ocat_messageContent[0])) ocat_prefix.classList.add('ocat-blocked');
 			ocat_prefix.classList.add('ocat-left');
-			ocat_prefix.textContent = ocat_messageContent[0] + ocat._USER_SEPERATOR;
+			ocat_prefix.textContent = ocat_messageContent[0];
 			msg = msg.substring(ocat_messageContent[0].length + ocat._USER_SEPERATOR.length);
 		}
 		msg`)
