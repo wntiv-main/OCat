@@ -77,13 +77,13 @@ var ocat = {
 			this._faviconCanvas.drawImage(img, 0, 0, w, h);
 			if(this._unreads) {
 				this._faviconCanvas.fillStyle = "#ff0000";
-				this._faviconCanvas.arc(w * 3 / 4, h * 3 / 4, (w + h) / 2 / 4, 0, Math.PI * 2);
+				this._faviconCanvas.arc(w * 2 / 3, h * 2 / 3, (w + h) / 2 / 3, 0, Math.PI * 2);
 				this._faviconCanvas.fill();
-				this._faviconCanvas.font = `${(w + h) / 2 / 2 * 3 / 4}px sans-serif`;
+				this._faviconCanvas.font = `${(w + h) / 2 / 3 * 2 * 3 / 4}px sans-serif`;
 				this._faviconCanvas.textAlign = "center";
 				this._faviconCanvas.textBaseline = "middle";
 				this._faviconCanvas.fillStyle = "#ffffff";
-				this._faviconCanvas.fillText(`${this._unreads < 9 ? this._unreads : "9+"}`, w * 3 / 4, h * 3 / 4 + 1);
+				this._faviconCanvas.fillText(`${this._unreads < 9 ? this._unreads : "9+"}`, w * 2 / 3, h * 2 / 3 + 1);
 			}
 			this._faviconCanvas.canvas.convertToBlob().then(blob => {
 				if(this._faviconUrl) URL.revokeObjectURL(this._faviconUrl);
