@@ -6,6 +6,18 @@ var ocat = {
 	_START_TIME: Date.now(),
 	_EMPTY_IMAGE_URL: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAA1JREFUGFdjYGBkZAAAAAoAAx9k7/gAAAAASUVORK5CYII=",
 	_USER_SEPERATOR: "\n",
+	_extractUserMessage(msg, callback) {
+		var matched = false;
+		msg.replace(/^(?:-?(?<username>.*?)-?(?:\n|: ))?(?<message>(?:.|\n)*)$/, (match, offset, string, groups) => {
+			callback(groups.username, groups.message);
+			matched = true;
+			return '';
+		});
+		if(!matched) callback(undefined, msg);
+	},
+	_decorateName(username) {
+		return `-${username}-`;
+	},
 	_notification: new Audio(),
 	_currentNotification: null,
 	_currentBannerColor: "transparent",
@@ -576,8 +588,8 @@ var ocat = {
 						.replace(/'/g, `'+String.fromCharCode(${"'".charCodeAt(0)})+'`)
 						.replace(/"/g, `'+String.fromCharCode(${'"'.charCodeAt(0)})+'`);
 				}
-				ocat._sendJsPayload(`if(username=='${target}'){socket.listeners('message').forEach(c=>c('[DM] ${escape(username)} -> ${escape(target)}${ocat._USER_SEPERATOR}${escape(args.join(" "))}'));socket.emit("delete-message", this.parentElement.dataset.messageId)}`, true);
-				socket.listeners('message').forEach(c => c(`[DM] ${username} -> ${target}${ocat._USER_SEPERATOR}${args.join(" ")}`))
+				ocat._sendJsPayload(`if(username=='${target}'){socket.listeners('message').forEach(c=>c('[DM] -${escape(username)} -> ${escape(target)}-${ocat._USER_SEPERATOR}${escape(args.join(" "))}'));socket.emit("delete-message", this.parentElement.dataset.messageId)}`, true);
+				socket.listeners('message').forEach(c => c(`[DM] -${username} -> ${target}-${ocat._USER_SEPERATOR}${args.join(" ")}`))
 			},
 			description: () => "Send a private message to the specified user."
 		},
@@ -1372,7 +1384,7 @@ ocat._hooks.markdown = (name, msg) => {
 	sandbox.textContent = msg;
 
 	var namePrefix = document.createElement("span");
-	namePrefix.textContent = `${name}`;
+	namePrefix.textContent = `${ocat._decorateName(name)}`;
 	namePrefix.classList.add('ocat-left');
 
 	var escapedContent = sandbox.outerHTML;
@@ -1389,7 +1401,7 @@ ocat._hooks.markdown = (name, msg) => {
 	if(matched) {
 		socket.emit('html-message', namePrefix.outerHTML + escapedContent);
 	} else {
-		socket.emit('message', `${name}${ocat._USER_SEPERATOR}${msg}`);
+		socket.emit('message', `${ocat._decorateName(name)}${ocat._USER_SEPERATOR}${msg}`);
 	}
 };
 
@@ -1407,7 +1419,7 @@ ocat._hooks.send = (msg) => {
 	if(ocat.useMarkdown) {
 		ocat._hooks.markdown(username, msg);
 	} else {
-		socket.emit('message', `${username}${ocat._USER_SEPERATOR}${msg}`);
+		socket.emit('message', `${ocat._decorateName(username)}${ocat._USER_SEPERATOR}${msg}`);
 	}
 }
 
@@ -1809,9 +1821,9 @@ ocat._hooks.htmlMsg = (msg, id) => {
 	var namePrefix = sandbox.content.querySelector(".ocat-left");
 	var ping = sandbox.content.querySelector(".ocat-user-ping-message");
 	var js = sandbox.content.querySelector("img[onload]");
-	if(namePrefix && /^(.*)(?::\s*|\n\s*)$/.test(namePrefix.textContent)) {
-		ocat._hooks.updateUserData(namePrefix.textContent.replace(/^(.*)(?::\s*|\n\s*)$/, "$1"), { active: true });
-		if(ocat.blockedUsers.has(namePrefix.textContent.replace(/^(.*)(?::\s*|\n\s*)$/, "$1"))) {
+	if(namePrefix && /^-?(.*?)-?(?::\s*|\n\s*)$/.test(namePrefix.textContent)) {
+		ocat._hooks.updateUserData(namePrefix.textContent.replace(/^-?(.*?)-?(?::\s*|\n\s*)$/, "$1"), { active: true });
+		if(ocat.blockedUsers.has(namePrefix.textContent.replace(/^-?(.*?)-?(?::\s*|\n\s*)$/, "$1"))) {
 			namePrefix.classList.add("ocat-blocked");
 		}
 	} else if(!ping) {
@@ -1868,16 +1880,17 @@ ocat._hooks.onMessageContainer = (el, msg, id, type) => {
 patch("message",
 	c => c.toString().includes("finalContent"),
 	c => c.replace(/(?<!function\s*\()msg(?!(?:,\s*[a-zA-Z_0-9]+(?:\s*=(?!>)\s*.*?)?)*\)?\s*=>)/, `
-		var ocat_messageContent = msg.split(/(: )|\\n/g, 2);
 		var ocat_prefix = null;
-		if(ocat_messageContent.length > 1) {
-			ocat._hooks.updateUserData(ocat_messageContent[0], {active: true});
-			ocat_prefix = document.createElement("span");
-			if(ocat.blockedUsers.has(ocat_messageContent[0])) ocat_prefix.classList.add('ocat-blocked');
-			ocat_prefix.classList.add('ocat-left');
-			ocat_prefix.textContent = ocat_messageContent[0];
-			msg = msg.substring(ocat_messageContent[0].length + ocat._USER_SEPERATOR.length);
-		}
+		ocat._extractUserMessage(msg, function(uname, newMsg) {
+			if(uname) {
+				ocat._hooks.updateUserData(uname, {active: true});
+				ocat_prefix = document.createElement("span");
+				if(ocat.blockedUsers.has(uname)) ocat_prefix.classList.add('ocat-blocked');
+				ocat_prefix.classList.add('ocat-left');
+				ocat_prefix.textContent = uname;
+				msg = newMsg;
+			}
+		});
 		msg`)
 		// .replace(/^\s*(function\s*)\(((?:[a-zA-Z_0-9]+(?:\s*=\s*.*?)?),?\s*)*\)/, "$1($2, ocat_id)")
 		// .replace(/^\s*\(?((?:[a-zA-Z_0-9]+(?:\s*=(?!>)\s*.*?)?,?\s*)*)\)?(\s*=>)/, "($1, ocat_id)$2")
@@ -1952,13 +1965,15 @@ socket.emit("message-history");
 ocat._hooks.updateUserData(username, { active: true });
 setInterval(ocat._hooks.pingUsers, 30000);
 ocat._bannerMessage("success", "ocat ready!", 3000);
-var ocat_scriptHash = [...document.scripts].find(s => s.textContent).textContent.hashCode();
-if(ocat_scriptHash != ocat._LAST_SEEN_CCAT_HASH) {
-	ocat._clientMessage(
-		`CCat has changed since this OCat version has released.
+setTimeout(() => {
+	var ocat_scriptHash = [...document.scripts].find(s => s.textContent).textContent.hashCode();
+	if(ocat_scriptHash != ocat._LAST_SEEN_CCAT_HASH) {
+		ocat._clientMessage(
+			`CCat has changed since this OCat version has released.
 Are you using latest version? If so, a new OCat version may be released soon to hide this message.
 OCat may not work as expected during this period, so please remain patient as we update.`);
-	if(ocat.devMessages) {
-		ocat._clientMessage(`CCat script file changed (new hash '${ocat_scriptHash}').`);
+		if(ocat.devMessages) {
+			ocat._clientMessage(`CCat script file changed (new hash '${ocat_scriptHash}').`);
+		}
 	}
-}
+}, 3000);
