@@ -750,6 +750,10 @@ body {
 	border-radius: unset;
 }
 
+#message-container {
+	margin-left: unset;
+}
+
 #message-container > div {
 	border: unset;
 	width: unset;
