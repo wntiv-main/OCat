@@ -744,6 +744,17 @@ body {
 	--ocat-success-color: #40ff4080;
 }
 
+#message-input {
+	width: unset;
+	height: unset;
+	border-radius: unset;
+}
+
+#message-container > div {
+	border: unset;
+	width: unset;
+}
+
 .darkmode {
 	background: #1e1e1e;
 }
@@ -839,11 +850,6 @@ body {
 .ocat-grow-wrap > textarea,
 .ocat-grow-wrap::after {
 	grid-area: 1 / 1 / 2 / 2;
-}
-
-#message-container > div {
-	border: none;
-	width: 100%;
 }
 
 #message-container > div:not(.ocat-banner-container) {
