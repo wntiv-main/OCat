@@ -1205,6 +1205,13 @@ body {
 .ocat-important-action {
 	color: red;
 }
+
+.ocat-system-message {
+	color: #777;
+	font-size: 0.8em;
+	text-align: center;
+	padding: 8px;
+}
 `;
 document.head.appendChild(css);
 
@@ -1730,6 +1737,11 @@ ocat._hooks.onMessageContainer = (el, msg, id, type) => {
 	// el.dataset.ocatMessageId = id;
 	// Remove OCat client messages
 	if(id < 0) return true;
+	if(type.toUpperCase() == "CHAT"
+		&& (/^(.*) joined\s*the\s*chat.*\.?\s*$/i.test(msg)
+			|| /^(.*) left\s*the\s*chat.*\.?\s*$/i.test(msg))) {
+		el.classList.add("ocat-system-message");
+	}
 	el.addEventListener("contextmenu", e => ocat._showContextMenu(e, [
 		{
 			label: "Edit",
