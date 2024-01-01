@@ -164,7 +164,11 @@ var ocat = {
 			itemEl.textContent = item.label;
 			itemEl.title = item.label;
 			if(item.classes) itemEl.classList.add(...item.classes);
-			itemEl.addEventListener("click", item.action);
+			itemEl.addEventListener("click", function(e) {
+				e.stopPropagation();
+				item.action(e);
+				e.target.parentElement.remove();
+			});
 			contextMenuContainer.appendChild(itemEl);
 		});
 		var left = e.clientX;
