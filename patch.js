@@ -189,6 +189,14 @@ var ocat = {
 			socket.off("debug");
 		}
 	},
+	_compactMode: false,
+	get compactMode() {
+		return this._compactMode;
+	},
+	set compactMode(value) {
+		this._compactMode = value;
+		document.body.classList.toggle("ocat-compact-mode", value);
+	},
 	useMarkdown: false,
 	antiXss: false,
 	silentTyping: false,
@@ -723,6 +731,7 @@ function addStringSettingCommand(name, desc, msgFn, secret = false) {
 
 addToggleSettingCommand("systemNotifications", "Toggles sending system notifications when messages are received.", b => `${b ? "Enabled" : "Disabled"} system notifications`);
 addStringSettingCommand("theme", "Sets the theme.", s => `Switched to ${s}`);
+addToggleSettingCommand("compactMode", "Shows messages on a single line.", b => `${b ? "Now" : "No longer"} using compact mode.`);
 addToggleSettingCommand("useMarkdown", "Allows use of markdown in chat messages.", b => `${b ? "Enabled" : "Disabled"} markdown parser`);
 addToggleSettingCommand("antiXss", "Remove XSS payloads.", b => `${b ? "Now" : "No longer"} checking payloads for XSS.`, true);
 addToggleSettingCommand("silentTyping", "Do not show users that you are typing.", b => `${b ? "Now" : "No longer"} silently typing.`);
@@ -973,13 +982,22 @@ body {
 	background: #80808040;
 }
 
-#message-container > div:has(> .ocat-left) {
+#message-container > div > .ocat-left {
+	display: block;
+}
+
+.ocat-compact-mode #message-container > div:has(> .ocat-left) {
 	display: flex;
 }
 
-#message-container > div > .ocat-left {
+.ocat-compact-mode #message-container > div > .ocat-left {
+	display: inline;
 	margin-right: 0.5ch;
 	min-width: max-content;
+}
+
+.ocat-compact-mode #message-container > div > .ocat-left::after {
+	content: ":";
 }
 
 #message-container > div > .ocat-blocked {
