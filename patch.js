@@ -798,7 +798,8 @@ body {
 	overflow: hidden;
 }
 
-#typing-users::before {
+#typing-users::before,
+#typing-users.show-dots::before {
 	content: "";
 	background-image: url(https://assets-v2.lottiefiles.com/a/57f6e96a-117f-11ee-b56d-e33bc9416452/ibgqn49kqf.gif);
 	width: 1em;

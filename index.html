@@ -19,12 +19,36 @@
         #message-input {
             width: 100%;
             position: fixed;
-            bottom: 0;
+            bottom: 2em;
         }
 
         #message-container {
-            padding-bottom: 1em;
+            padding-bottom: 3em;
         }
+
+        #typing-users.show-dots::before {
+            content: "";
+            background-image: url(../images/Typing-Dots.gif);
+            width: 2em;
+            height: 2em;
+            display: inline-block;
+            background-size: contain;
+            bottom: 0em;
+        }
+
+        #typing-users {
+            position: fixed;
+            bottom: 0em;
+        }
+
+        #message-container > div:has(> .anti-flow-message) {
+            padding: 0;
+            height: 0px;
+            position: fixed;
+            top: -1000px;
+            background: transparent !important;
+        } 
+
 
         .lightmode {
             background-color: white;
@@ -142,6 +166,11 @@
             height: 80px;
             border: solid;
             border-color: aquamarine;
+        }
+
+        .disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
         }
 
         .ultradarkmode1 {
@@ -271,13 +300,17 @@
 
     <div id="message-container">
     </div>
+    <div id="typing-users"></div>
     <input id="message-input" />
     <script>
+        var typingIdle = -1;
         if (!("username" in localStorage)) {
             localStorage.username = prompt("Enter your username:");
         }
         var username = localStorage.username;
         document.getElementById("name-selector").value = username;
+
+        document.body.className = localStorage.theme || "darkmode"
 
         const socket = io();
         socket.on('message', console.log);
@@ -310,67 +343,99 @@
             document.getElementById("message-container").appendChild(item);
             window.scrollTo(0, document.body.scrollHeight);
         });
-        document.getElementById("message-input").addEventListener("change", e => {
-            if (e.target.value == "/help") {
-                socket.listeners("message").forEach(c => c(
-                    `Help: /help: Show this menu.`));
+
+        document.getElementById("message-input").addEventListener("keypress", e => {
+            socket.emit("typing", username, !!e.target.value);
+            clearTimeout(typingIdle);
+            typingIdle = setTimeout(() => socket.emit("typing", username, false), 3e3);
+            if (e.key == "Enter") {
+                socket.emit("typing", username, false);
+                if (e.target.value == "/help") {
+                    socket.listeners("message").forEach(c => c(
+                        `Help: /help: Show this menu.`));
+                    e.target.value = "";
+                    return;
+                }
+                socket.emit("message", `${username}: ${e.target.value}`);
                 e.target.value = "";
-                return;
             }
-            socket.emit("message", `${username}: ${e.target.value}`);
-            e.target.value = "";
+        });
+
+        var typingUsers = new Set();
+        socket.on("typing", (user, typing) => {
+            if (typing) {
+                typingUsers.add(user);
+            } else {
+                typingUsers.delete(user);
+            }
+            // show users to screen
+            document.getElementById("typing-users").textContent = [...typingUsers].join(", ");
+            document.getElementById("typing-users").classList.toggle("show-dots", !!typingUsers.size);
         });
         //gray
         document.getElementById("dark-theme").addEventListener("click", e => {
             document.body.className = "darkmode";
+            localStorage.theme = "darkmode";
         });
         //black
         document.getElementById("udark-theme").addEventListener("click", e => {
             document.body.className = "ultradarkmode";
+            localStorage.theme = "ultradarkmode";
         });
         //white
         document.getElementById("light-theme").addEventListener("click", e => {
             document.body.className = "lightmode";
+            localStorage.theme = "lightmode";
         });
         //blue
         document.getElementById("blue-theme").addEventListener("click", e => {
             document.body.className = "bluetheme";
+            localStorage.theme = "bluetheme";
         });
         //red
         document.getElementById("red-theme").addEventListener("click", e => {
             document.body.className = "redtheme";
+            localStorage.theme = "redtheme";
         });
         //yellow
         document.getElementById("yellow-theme").addEventListener("click", e => {
             document.body.className = "yellowtheme";
+            localStorage.theme = "yellowtheme";
         });
         //green
         document.getElementById("green-theme").addEventListener("click", e => {
             document.body.className = "greentheme";
+            localStorage.theme = "greentheme";
         });
         //rainbow
         document.getElementById("rainbow-theme").addEventListener("click", e => {
             document.body.className = "rainbowtheme";
+            localStorage.theme = "rainbowtheme";
         });
         //minecraft image 1
         document.getElementById("minecraft-theme-one").addEventListener("click", e => {
             document.body.className = "minecraftthemeone";
+            localStorage.theme = "minecraftthemeone";
         });
         //minecraft image 2
         document.getElementById("minecraft-theme-two").addEventListener("click", e => {
             document.body.className = "minecraftthemetwo";
+            localStorage.theme = "minecraftthemetwo";
         });
         //minecraft image 3
         document.getElementById("minecraft-theme-three").addEventListener("click", e => {
             document.body.className = "minecraftthemethree";
+            localStorage.theme = "minecraftthemethree";
         });
         //minecraft image 4
         document.getElementById("minecraft-theme-four").addEventListener("click", e => {
             document.body.className = "minecraftthemefour";
+            localStorage.theme = "minecraftthemefour";
         });
         //gdash image 1
         document.getElementById("geometry-dash-theme-one").addEventListener("click", e => {
             document.body.className = "geometrydashthemeone";
+            localStorage.theme = "geometrydashthemeone";
         });
         //gdash image 2
         //document.getElementById("geometry-dash-theme-two").addEventListener("click", e => {
@@ -379,6 +444,7 @@
         //teardown image 1
         document.getElementById("teardown-theme-one").addEventListener("click", e => {
             document.body.className = "teardownthemeone";
+            localStorage.theme = "teardownthemeone";
         });
 
         socket.on('html-message', function (msg, id) {
@@ -398,6 +464,11 @@
             socket.emit("message", username + " left the chat");
         });
         window.alert = msg => { }
+
+        socket.on("delete-message", id => {
+            var el = document.querySelector(`#message-container > div[data-message-id="${id}"]`);
+            if (el) el.remove();
+        });
 
         socket.emit("message-history");
         socket.emit('message', `${username} Joined The Chat.`);
