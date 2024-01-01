@@ -60,7 +60,7 @@ var ocat = {
 		var img = new Image();
 		img.addEventListener("load", function(e) {
 			ocat._favicon = e.target;
-			callback(_favicon);
+			callback(ocat._favicon);
 		});
 		img.src = favicon;
 	},
