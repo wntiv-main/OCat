@@ -1802,7 +1802,7 @@ patch("html-message",
 ['message', 'html-message'].forEach(type => {
 	socket.on(type, function(msg) {
 		var msgs = document.getElementById("message-container");
-		if(msgs.scrollHeight - msgs.scrollTop - msgs.clientHeight < 100 || Date.now() - ocat._START_TIME < 10e3)
+		if(msgs.scrollHeight - msgs.scrollTop - msgs.clientHeight < 100 + msgs.lastElementChild.getBoundingClientRect().height || Date.now() - ocat._START_TIME < 10e3)
 			msgs.scrollTop = msgs.scrollHeight;
 	});
 });
