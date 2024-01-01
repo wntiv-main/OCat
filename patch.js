@@ -47,6 +47,56 @@ var ocat = {
 			}, maxTime);
 		}
 	},
+	_favicon: null,
+	_getFavicon(callback) {
+		if(this._favicon) return callback(this._favicon);
+		var favicon = "/favicon.ico";
+		var nodeList = document.getElementsByTagName("link");
+		for(var i = 0; i < nodeList.length; i++) {
+			if(nodeList[i].getAttribute("rel").includes(icon)) {
+				favicon = nodeList[i].href;
+			}
+		}
+		var img = new Image();
+		img.addEventListener("load", function(e) {
+			ocat._favicon = e.target;
+			callback(_favicon);
+		});
+		img.src = favicon;
+	},
+	_faviconCanvas: new OffscreenCanvas(32, 32),
+	_faviconContext: this._faviconCanvas.getContext('2d', {
+		willReadFrequently: true
+	}),
+	_faviconUrl: null,
+	_unreads: 0,
+	_updateFavicon() {
+		this._getFavicon(img => {
+			this._faviconContext.clearRect(0, 0, 32, 32);
+			this._faviconContext.drawImage(img, 0, 0, 32, 32);
+			if(this._unreads) {
+				this._faviconContext.fillStyle = "#ff0000";
+				this._faviconContext.arc(24, 24, 8, 0, Math.PI * 2);
+				this._faviconContext.fill();
+				this._faviconContext.font = "12px sans-serif";
+				this._faviconContext.textAlign = "center";
+				this._faviconContext.textBaseline = "middle";
+				this._faviconContext.fillStyle = "#ffffff";
+				this._faviconContext.fillText(`${this._unreads < 9 ? this._unreads : "9+"}`, 24, 25);
+			}
+			this._faviconCanvas.convertToBlob().then(blob => {
+				if(this._faviconUrl) URL.revokeObjectURL(this._faviconUrl);
+				this._faviconUrl = URL.createObjectURL(blob);
+				var link = document.querySelector("link[rel~='icon']");
+				if(!link) {
+					link = document.createElement('link');
+					link.rel = 'icon';
+					document.head.appendChild(link);
+				}
+				link.href = this._faviconUrl;
+			});
+		});
+	},
 	_canvas: new OffscreenCanvas(1, 1).getContext('2d', {
 		willReadFrequently: true
 	}),
@@ -73,6 +123,8 @@ var ocat = {
 	_notify(msg, type, el) {
 		if(document.hasFocus() || document.visibilityState == "visible") return;
 		if(msg.includes("ocat-user-ping-message")) return;
+		this._unreads++;
+		this._updateFavicon();
 		if(this.systemNotifications) {
 			var notif = new Notification(`CCat (${type.toUpperCase()})`, {
 				body: msg
@@ -619,6 +671,8 @@ document.addEventListener("visibilitychange", () => {
 		// The tab has become visible so clear the now-stale Notification.
 		if(ocat._currentNotification)
 			ocat._currentNotification.close();
+		ocat._unreads = 0;
+		ocat._updateFavicon();
 	}
 });
 
