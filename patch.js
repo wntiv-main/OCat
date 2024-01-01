@@ -8,7 +8,8 @@ var ocat = {
 	_USER_SEPERATOR: "\n",
 	_extractUserMessage(msg, callback) {
 		var matched = false;
-		msg.replace(/^(?:-?(?<username>.*?)-?(?:\n|: ))?(?<message>(?:.|\n)*)$/, (match, offset, string, groups) => {
+		msg.replace(/^(?:-?(?<username>.*?)-?(?:\n|: ))?(?<message>(?:.|\n)*)$/, (...args) => {
+			var groups = args.pop();
 			callback(groups.username, groups.message);
 			matched = true;
 			return '';
