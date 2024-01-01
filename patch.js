@@ -821,10 +821,6 @@ body {
 	overflow: hidden;
 }
 
-.ocat-grow-wrap:has(> #message-input) {
-	margin-top: -1px;
-}
-
 .ocat-grow-wrap > #message-input,
 .ocat-grow-wrap:has(> #message-input)::after {
 	margin: 0;
