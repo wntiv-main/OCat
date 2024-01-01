@@ -812,6 +812,7 @@ body {
 	min-height: 0;
 	height: 0;
 	padding-bottom: 0;
+	padding-top: 0;
 }
 
 #ocat-input-wrapper {
