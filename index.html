@@ -17,13 +17,22 @@
         }
 
         #message-input {
-            width: 100%;
+            width: 69%;
+            height: 20px;
             position: fixed;
-            bottom: 2em;
+            bottom: 0em;
+            left: 5em;
+            border-radius: 50px;
+        }
+
+        #message-container > div {
+            border: 1px solid green; /* or whatever you want */
+            width: 73%;
         }
 
         #message-container {
             padding-bottom: 3em;
+            padding-left: 4em;
         }
 
         #typing-users.show-dots::before {
@@ -34,11 +43,14 @@
             display: inline-block;
             background-size: contain;
             bottom: 0em;
+            margin-right: 10px;
         }
 
         #typing-users {
             position: fixed;
-            bottom: 0em;
+            bottom: 1.8em;
+            left: 5em;
+            background-color: black;
         }
 
         #message-container > div:has(> .anti-flow-message) {
@@ -159,7 +171,15 @@
             top: 0px;
         }
 
-        .button {
+        .left-sidebar {
+            position: fixed;
+            width: 4%;
+            height: 100%;
+            left: 0px;
+            top: 0px;
+        }
+
+        .themebutton {
             cursor: pointer;
             border: none;
             width: 80px;
@@ -235,11 +255,18 @@
 </head>
 
 <body>
-    <h1>Welcome To CCat</h1>
-
-    <p>Be nice to people</p>
-
+    <div class="left-sidebar">
+    
+        <button class="button" id="home-button">hello</button>
+    
+    </div>
+    
     <div class="right sidebar">
+
+        <h1>Welcome To CCat</h1>
+
+        <p>Be nice to people</p>
+
         <h1>User Settings</h1>
         <p>(Beta)</p>
 
@@ -254,47 +281,47 @@
 
         <p>Basic Themes</p>
 
-        <button class="button" id="light-theme"> </button>
+        <button class="themebutton" id="light-theme"> </button>
 
-        <button class="button darkmode1" id="dark-theme"> </button>
+        <button class="themebutton darkmode1" id="dark-theme"> </button>
 
-        <button class="button ultradarkmode1" id="udark-theme"> </button>
+        <button class="themebutton ultradarkmode1" id="udark-theme"> </button>
 
 
         <p>Colored Themes</p>
         <!-- blue -->
-        <button class="button bluetheme1" id="blue-theme"> </button>
+        <button class="themebutton bluetheme1" id="blue-theme"> </button>
         <!-- red -->
-        <button class="button redtheme1" id="red-theme"> </button>
+        <button class="themebutton redtheme1" id="red-theme"> </button>
         <!-- yellow -->
-        <button class="button yellowtheme1" id="yellow-theme"> </button>
+        <button class="themebutton yellowtheme1" id="yellow-theme"> </button>
         <!-- green -->
-        <button class="button greentheme1" id="green-theme"> </button>
+        <button class="themebutton greentheme1" id="green-theme"> </button>
         <!-- rainbow -->
-        <button class="button rainbowtheme1" id="rainbow-theme"> </button>
+        <button class="themebutton rainbowtheme1" id="rainbow-theme"> </button>
 
 
         <p>Image Themes</p>
 
         <!-- minecraft1 -->
-        <button class="button mctheme1" id="minecraft-theme-one"> </button>
+        <button class="themebutton mctheme1" id="minecraft-theme-one"> </button>
 
         <!-- minecraft2 -->
-        <button class="button mctheme2" id="minecraft-theme-two"> </button>
+        <button class="themebutton mctheme2" id="minecraft-theme-two"> </button>
 
         <!-- minecraft3 -->
-        <button class="button mctheme3" id="minecraft-theme-three"> </button>
+        <button class="themebutton mctheme3" id="minecraft-theme-three"> </button>
 
         <!-- minecraft4 -->
-        <button class="button mctheme4" id="minecraft-theme-four"> </button>
+        <button class="themebutton mctheme4" id="minecraft-theme-four"> </button>
 
         <!-- gdash1 -->
-        <button class="button gdtheme1" id="geometry-dash-theme-one"> </button>
+        <button class="themebutton gdtheme1" id="geometry-dash-theme-one"> </button>
 
         <!-- gdash2 -->
         <!-- <button id="geometry-dash-theme-two">Geometry Dash Theme 2</button> -->
         <!-- gdash1 -->
-        <button class="button teartheme1" id="teardown-theme-one"> </button>
+        <button class="themebutton teartheme1" id="teardown-theme-one"> </button>
 
     </div>
 
@@ -341,7 +368,8 @@
             item.append(...(finalContent.reverse()));
             item.dataset.messageId = id;
             document.getElementById("message-container").appendChild(item);
-            window.scrollTo(0, document.body.scrollHeight);
+            if(document.scrollingElement.scrollHeight - document.scrollingElement.scrollTop - document.scrollingElement.clientHeight - item.getBoundingClientRect().height < 100)
+                window.scrollTo(0, document.scrollingElement.scrollHeight);
         });
 
         document.getElementById("message-input").addEventListener("keypress", e => {
@@ -452,7 +480,8 @@
             item.innerHTML = msg;
             item.dataset.messageId = id;
             document.getElementById("message-container").appendChild(item);
-            window.scrollTo(0, document.body.scrollHeight);
+            if(document.scrollingElement.scrollHeight - document.scrollingElement.scrollTop - document.scrollingElement.clientHeight - item.getBoundingClientRect().height < 100)
+                window.scrollTo(0, document.scrollingElement.scrollHeight);
         });
         //name selector
         document.getElementById("name-selector").addEventListener("change", e => {
