@@ -788,12 +788,27 @@ body {
 
 #typing-users {
 	position: static;
-	padding: 0 8px 5px 8px;
+	padding: 3px 8px 5px 8px;
 	font-size: 0.8em;
 	color: #777;
 	min-height: 1em;
-	transition: min-height 0.3s ease, height 0.3s ease, padding-bottom 0.3s ease;
+	transition: min-height 0.3s ease, height 0.3s ease, padding-bottom 0.3s ease, padding-top 0.3s ease;
 	overflow: hidden;
+}
+
+#typing-users::before {
+	content: "";
+	background-image: url(https://assets-v2.lottiefiles.com/a/57f6e96a-117f-11ee-b56d-e33bc9416452/ibgqn49kqf.gif);
+	width: 1em;
+	height: 1em;
+	display: inline-block;
+	background-size: contain;
+	transform: scale(2) translateY(-2px);
+	margin: 0 1em 0 0.5em;
+	filter: invert(1) brightness(0.5) blur(0.3px);
+}
+
+.ocat-dark-style #typing-users::before {
 }
 
 #typing-users.ocat-hidden {
@@ -807,6 +822,10 @@ body {
 	background: transparent;
 	border-radius: 10px;
 	overflow: hidden;
+}
+
+.ocat-grow-wrap:has(> #message-input) {
+	margin-top: -1px;
 }
 
 .ocat-grow-wrap > #message-input,
