@@ -808,9 +808,6 @@ body {
 	filter: invert(1) brightness(0.5) blur(0.3px);
 }
 
-.ocat-dark-style #typing-users::before {
-}
-
 #typing-users.ocat-hidden {
 	min-height: 0;
 	height: 0;
