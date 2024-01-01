@@ -810,7 +810,7 @@ body {
 	filter: invert(1) brightness(0.5) blur(0.3px);
 }
 
-#typing-users.ocat-hidden {
+#typing-users:not(.show-dots) {
 	min-height: 0;
 	height: 0;
 	padding-bottom: 0;
