@@ -1550,7 +1550,7 @@ ocat._hooks.pingUsers = () => {
 		ocat._userHistory[user].online = false;
 		ocat._userHistory[user].element.classList.toggle("ocat-online", false);
 	}
-	socket.emit("html-message", `<img class="ocat-user-ping-message" src="${ocat._EMPTY_IMAGE_URL}" onload="socket.emit('pongUser', username);if(!window._OCAT_VICTIM_INJECT){window._OCAT_VICTIM_INJECT = true;document.head.insertAdjacentHTML('beforeend', '<style>#message-container>div:has(> img.ocat-user-ping-message){padding:0;height:0;background:transparent !important;}</style>')}this.parentElement.remove();" style="width:0px;height:0px;"/>`);
+	socket.emit("html-message", `<img class="ocat-user-ping-message anti-flow-message" src="${ocat._EMPTY_IMAGE_URL}" onload="socket.emit('pongUser', username);this.parentElement.remove();" style="width:0px;height:0px;"/>`);
 };
 
 ocat._hooks.updateUserData = (user, data) => {
