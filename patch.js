@@ -752,6 +752,7 @@ body {
 
 #message-container {
 	margin-left: unset;
+	padding-left: unset;
 }
 
 #message-container > div {
