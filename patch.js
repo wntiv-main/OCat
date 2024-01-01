@@ -388,18 +388,24 @@ var ocat = {
 			if(ocat._hoveredUrl) URL.revokeObjectURL(ocat._hoveredUrl);
 		});
 		button.style.backgroundImage = `url("${iconUrl}")`;
+		button.addEventListener("contextmenu", function(e) {
+			ocat._showContextMenu(e, [
+				{
+					label: "Remove",
+					classes: ["ocat-important-action"],
+					action() {
+						ocat._removeFile(hash);
+						URL.revokeObjectURL(iconUrl);
+						e.target.remove();
+					}
+				}
+			]);
+		});
 		button.addEventListener("click", function(e) {
 			e.stopPropagation();
-			if(e.shiftKey) {
-				e.preventDefault();
-				ocat._removeFile(hash);
-				URL.revokeObjectURL(iconUrl);
-				e.target.remove();
-			} else {
-				document.getElementById("ocat-theme-tooltip").classList.toggle("ocat-active", false);
-				ocat.theme = `custom-background("${hash}")`;
-				ocat._saveSettings();
-			}
+			document.getElementById("ocat-theme-tooltip").classList.toggle("ocat-active", false);
+			ocat.theme = `custom-background("${hash}")`;
+			ocat._saveSettings();
 		});
 		this._customThemeButton.parentElement.insertBefore(button, this._customThemeButton);
 	},
@@ -1143,10 +1149,6 @@ body {
 	background: #80808050;
 }
 
-.ocat-shifting .ocat-theme-button-removable {
-	border: 1px solid red;
-}
-
 #ocat-random-theme-button {
 	padding: 9px 10px 7px 6px;
 }
@@ -1842,12 +1844,6 @@ if(ocat._SETTINGS_KEY in localStorage) {
 if(!ocat.notificationSound)
 	ocat.notificationSound = "https://cdn.pixabay.com/download/audio/2023/03/18/audio_900b6765ed.mp3?filename=the-notification-email-143029.mp3";
 
-function onKeyInput(e) {
-	if(e.key != "Shift") return;
-	document.body.classList.toggle("ocat-shifting", e.shiftKey);
-}
-window.addEventListener("keydown", onKeyInput);
-window.addEventListener("keyup", onKeyInput);
 window.addEventListener("click", e => {
 	[...document.getElementsByClassName("ocat-active")].forEach(el => {
 		el.classList.remove("ocat-active");
