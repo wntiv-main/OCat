@@ -766,6 +766,7 @@ body {
 }
 
 #message-container > div {
+	margin-bottom: unset;
 	border: unset;
 	width: unset;
 }
