@@ -2,7 +2,7 @@ if(!!ocat) throw new Error("Already Injected");
 
 window._OCAT_VICTIM_INJECT = true;
 var ocat = {
-	_LAST_SEEN_CCAT_HASH: -577453995,
+	_LAST_SEEN_CCAT_HASH: 1852698855,
 	_START_TIME: Date.now(),
 	_EMPTY_IMAGE_URL: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAA1JREFUGFdjYGBkZAAAAAoAAx9k7/gAAAAASUVORK5CYII=",
 	_notification: new Audio(),
@@ -1796,6 +1796,11 @@ patch("html-message",
 			`var ocat_messageContainer = ($3);
 			if(ocat._hooks.onMessageContainer(ocat_messageContainer, msg, id, "HTML"))
 				$1(ocat_messageContainer)`)
+);
+
+patch("typing",
+	() => true,
+	c => c.replace("{", "{if(user==username)return;")
 );
 
 ['message', 'html-message'].forEach(type => {
