@@ -803,7 +803,7 @@ body {
 	height: 1em;
 	display: inline-block;
 	background-size: contain;
-	transform: scale(2) translateY(-2px);
+	transform: scale(2, -2) translateY(-4px);
 	margin: 0 1em 0 0.5em;
 	filter: invert(1) brightness(0.5) blur(0.3px);
 }
@@ -1340,10 +1340,6 @@ inputWrapper.appendChild(messageContainer);
 
 var typingIndicator = document.getElementById("typing-users");
 inputWrapper.appendChild(typingIndicator);
-typingIndicator.classList.toggle("ocat-hidden", !typingUsers.size);
-socket.on("typing", function(user, typing) {
-	typingIndicator.classList.toggle("ocat-hidden", !typingUsers.size);
-});
 messageToolbar.appendChild(inputWrapper);
 
 var nameSelector = document.createElement("label");
