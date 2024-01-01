@@ -1738,8 +1738,8 @@ ocat._hooks.onMessageContainer = (el, msg, id, type) => {
 	// Remove OCat client messages
 	if(id < 0) return true;
 	if(type.toUpperCase() == "CHAT"
-		&& (/^(.*) joined\s*the\s*chat.*\.?\s*$/i.test(msg)
-			|| /^(.*) left\s*the\s*chat.*\.?\s*$/i.test(msg))) {
+		&& (/^(.*[^:]) joined\s*the\s*chat.*\.?\s*$/i.test(msg)
+			|| /^(.*[^:]) left\s*the\s*chat.*\.?\s*$/i.test(msg))) {
 		el.classList.add("ocat-system-message");
 	}
 	el.addEventListener("contextmenu", e => ocat._showContextMenu(e, [
