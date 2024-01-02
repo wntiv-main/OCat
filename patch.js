@@ -221,9 +221,9 @@ var ocat = {
 		// readability, yes
 		if(this._vanish == value) return;
 		if(this._vanish = value) {
-			socket.emit("message", `${username} left the chat`);
+			socket.emit("message", `${username} Left The Chat. \u{1F44B}`);
 		} else {
-			socket.emit("message", `${username} Joined The Chat.`);
+			socket.emit("message", `${username} Joined The Chat. \u{1F44B}`);
 		}
 		(this._hooks.pingUsers || (() => { }))();
 	},
@@ -1707,11 +1707,11 @@ ocat._hooks.updateUserData = (user, data) => {
 };
 
 ocat._hooks.possibleConnectMessage = (m) => {
-	if(/^(.*) joined\s*the\s*chat.*\.?\s*$/i.test(m)) {
-		ocat._hooks.updateUserData(m.replace(/^(.*) joined\s*the\s*chat.*\.?\s*$/i, "$1"), { active: true });
+	if(/^(.*) joined\s*the\s*chat.*$/i.test(m)) {
+		ocat._hooks.updateUserData(m.replace(/^(.*) joined\s*the\s*chat.*$/i, "$1"), { active: true });
 	}
-	if(/^(.*) left\s*the\s*chat.*\.?\s*$/i.test(m)) {
-		ocat._hooks.updateUserData(m.replace(/^(.*) left\s*the\s*chat.*\.?\s*$/i, "$1"), { online: false });
+	if(/^(.*) left\s*the\s*chat.*$/i.test(m)) {
+		ocat._hooks.updateUserData(m.replace(/^(.*) left\s*the\s*chat.*$/i, "$1"), { online: false });
 		ocat._hooks.pingUsers();
 	}
 };
