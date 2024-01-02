@@ -1314,6 +1314,7 @@ body {
 	color: #777;
 	font-size: 0.8em;
 	text-align: center;
+	justify-content: center;
 	padding: 8px;
 }
 
