@@ -1954,7 +1954,7 @@ patch("message",
 			}
 		});
 		msg`)
-		.replace(/if\s*\((.*?)\)/, "if(($1) || ocat.showAllMessages)")
+		.replace(/if\s*\((.*?)\)/, "if(($1) && !ocat.showAllMessages)")
 		// .replace(/^\s*(function\s*)\(((?:[a-zA-Z_0-9]+(?:\s*=\s*.*?)?),?\s*)*\)/, "$1($2, ocat_id)")
 		// .replace(/^\s*\(?((?:[a-zA-Z_0-9]+(?:\s*=(?!>)\s*.*?)?,?\s*)*)\)?(\s*=>)/, "($1, ocat_id)$2")
 		.replace(/([a-zA-Z0-9_]+)\.style\.color\s*=\s*(['"`])blue\2/g,
@@ -1975,7 +1975,7 @@ patch("html-message",
 	c => c
 		.replace(/(?<!function\s*\((?:[a-zA-Z_0-9]+(?:\s*=(?!>)\s*.*?)?,\s*)*)msg(?!(?:,\s*[a-zA-Z_0-9]+(?:\s*=(?!>)\s*.*?)?)*\)?\s*=>)/g,
 			"((ocat.antiXss ? ocat._hooks.antiXss(ocat._hooks.htmlMsg(msg, id, room)) : ocat._hooks.htmlMsg(msg, id, room)))")
-		.replace(/if\s*\((.*?)\)/, "if(($1) || ocat.showAllMessages)")
+		.replace(/if\s*\((.*?)\)/, "if(($1) && !ocat.showAllMessages)")
 		// .replace(/^\s*(function\s*)\(((?:[a-zA-Z_0-9]+(?:\s*=\s*.*?)?),?\s*)*\)/, "$1($2, ocat_id)")
 		// .replace(/^\s*\(?((?:[a-zA-Z_0-9]+(?:\s*=(?!>)\s*.*?)?,?\s*)*)\)?(\s*=>)/, "($1, ocat_id)$2")
 		.replace(/(document\.getElementById\((['"`])message-container\2\).appendChild)\((.*)\)/,
