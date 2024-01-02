@@ -25,7 +25,7 @@
             border-radius: 50px;
         }
 
-        #message-container > div {
+        #message-container>div {
             margin-bottom: 10px;
             width: 73%;
             white-space: pre-line;
@@ -55,13 +55,13 @@
             bottom: 2.5em;
         }
 
-        #message-container > div:has(> .anti-flow-message) {
+        #message-container>div:has(> .anti-flow-message) {
             padding: 0;
             height: 0px;
             position: fixed;
             top: -1000px;
             background: transparent !important;
-        } 
+        }
 
 
         .lightmode {
@@ -190,6 +190,22 @@
             border-color: aquamarine;
         }
 
+        .home-button {
+            cursor: pointer;
+            width: 5em;
+            height: 5em;
+            background-image: url(/images/Logo2.png);
+            background-size: cover;
+        }
+
+        .pluz-button {
+            cursor: pointer;
+            width: 5em;
+            height: 5em;
+            background-image: url(/images/pluz.png);
+            background-size: cover;
+        }
+
         .disabled {
             opacity: 0.6;
             cursor: not-allowed;
@@ -257,10 +273,11 @@
 </head>
 
 <body>
-    
+
     <div class="left-sidebar">
 
-        <button class="button" id="home-button">hello</button>
+        <a href="/"><button class="button home-button"> </button></a>
+        <button class="button disabled pluz-button"> </button>
 
     </div>
 
@@ -280,51 +297,48 @@
 
         <h1>Theme Settings</h1>
         <p>(Beta)</p>
+        <p>Themes</p>
+
+        <button class="button themebutton" id="light-theme"> </button>
+
+        <button class="button themebutton darkmode1" id="dark-theme"> </button>
+
+        <button class="button themebutton ultradarkmode1" id="udark-theme"> </button>
 
 
-        <p>Basic Themes</p>
-
-        <button class="themebutton" id="light-theme"> </button>
-
-        <button class="themebutton darkmode1" id="dark-theme"> </button>
-
-        <button class="themebutton ultradarkmode1" id="udark-theme"> </button>
-
-
-        <p>Colored Themes</p>
+        <p>Colours</p>
         <!-- blue -->
-        <button class="themebutton bluetheme1" id="blue-theme"> </button>
+        <button class="button themebutton bluetheme1" id="blue-theme"> </button>
         <!-- red -->
-        <button class="themebutton redtheme1" id="red-theme"> </button>
+        <button class="button themebutton redtheme1" id="red-theme"> </button>
         <!-- yellow -->
-        <button class="themebutton yellowtheme1" id="yellow-theme"> </button>
+        <button class="button themebutton yellowtheme1" id="yellow-theme"> </button>
         <!-- green -->
-        <button class="themebutton greentheme1" id="green-theme"> </button>
+        <button class="button themebutton greentheme1" id="green-theme"> </button>
         <!-- rainbow -->
-        <button class="themebutton rainbowtheme1" id="rainbow-theme"> </button>
+        <button class="button themebutton rainbowtheme1" id="rainbow-theme"> </button>
 
 
-        <p>Image Themes</p>
-
+        <p>Images</p>
         <!-- minecraft1 -->
-        <button class="themebutton mctheme1" id="minecraft-theme-one"> </button>
+        <button class="button themebutton mctheme1" id="minecraft-theme-one"> </button>
 
         <!-- minecraft2 -->
-        <button class="themebutton mctheme2" id="minecraft-theme-two"> </button>
+        <button class="button themebutton mctheme2" id="minecraft-theme-two"> </button>
 
         <!-- minecraft3 -->
-        <button class="themebutton mctheme3" id="minecraft-theme-three"> </button>
+        <button class="button themebutton mctheme3" id="minecraft-theme-three"> </button>
 
         <!-- minecraft4 -->
-        <button class="themebutton mctheme4" id="minecraft-theme-four"> </button>
+        <button class="button themebutton mctheme4" id="minecraft-theme-four"> </button>
 
         <!-- gdash1 -->
-        <button class="themebutton gdtheme1" id="geometry-dash-theme-one"> </button>
+        <button class="button themebutton gdtheme1" id="geometry-dash-theme-one"> </button>
 
         <!-- gdash2 -->
         <!-- <button id="geometry-dash-theme-two">Geometry Dash Theme 2</button> -->
         <!-- gdash1 -->
-        <button class="themebutton teartheme1" id="teardown-theme-one"> </button>
+        <button class="button themebutton teartheme1" id="teardown-theme-one"> </button>
 
     </div>
 
@@ -333,34 +347,34 @@
     <div id="typing-users"></div>
     <input id="message-input" />
     <script>
-            function gotoRoom(room) {
-                location.replace(`#${room}`);
-                socket.emit("typing", currentRoom, username, false);
-                currentRoom = room;
-            }
-            var currentRoom = location.hash ? location.hash.substring(1) : (location.replace('#main'), 'main');
+        function gotoRoom(room) {
+            location.replace(`#${room}`);
+            socket.emit("typing", currentRoom, username, false);
+            currentRoom = room;
+        }
+        var currentRoom = location.hash ? location.hash.substring(1) : (location.replace('#main'), 'main');
         var typingIdle = -1;
-        if (!("username" in localStorage)) {
+        if(!("username" in localStorage)) {
             localStorage.username = prompt("Enter your username:");
         }
         var username = localStorage.username;
         document.getElementById("name-selector").value = username;
 
-        document.body.className = localStorage.theme || "darkmode"
+        document.body.className = localStorage.theme || "darkmode";
 
         const socket = io();
         socket.on('message', console.log);
-            socket.on("message", (room, id, msg) => {
-                if(room && room != currentRoom) return;
+        socket.on("message", (room, id, msg) => {
+            if(room && room != currentRoom) return;
             var finalContent = [];
             msg.split(" ").forEach((v, i) => {
-                if (i) {
-                    if (typeof (finalContent[0]) == "string") {
+                if(i) {
+                    if(typeof (finalContent[0]) == "string") {
                         finalContent[0] += " ";
                     } else finalContent.unshift(" ");
                 }
                 // https://stackoverflow.com/a/3809435
-                if (/(http(s)?:\/\/.)(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/g.test(v)) {
+                if(/(http(s)?:\/\/.)(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/g.test(v)) {
                     var el = document.createElement("a");
                     el.href = v;
                     el.textContent = v;
@@ -369,7 +383,7 @@
                     el.style.cursor = "pointer";
                     finalContent.unshift(el);
                 } else {
-                    if (i) {
+                    if(i) {
                         finalContent[0] += v;
                     } else finalContent.unshift(v);
                 }
@@ -386,31 +400,31 @@
             socket.emit("typing", currentRoom, username, !!e.target.value);
             clearTimeout(typingIdle);
             typingIdle = setTimeout(() => socket.emit("typing", currentRoom, username, false), 3e3);
-            if (e.key == "Enter") {
+            if(e.key == "Enter" && e.target.value.trim()) {
                 socket.emit("typing", currentRoom, username, false);
-                if (e.target.value == "/help") {
+                if(e.target.value.trim() == "/help") {
                     socket.listeners("message").forEach(c => c(
                         `Help: /help: Show this menu.`));
                     e.target.value = "";
                     return;
                 }
-                socket.emit("message", currentRoom, `-${username}-\n ${e.target.value}`);
+                socket.emit("message", currentRoom, `-${username}-\n${e.target.value.trim()}`);
                 e.target.value = "";
             }
         });
 
-                var typingUsers = {};
-                socket.on("typing", (room, user, typing) => {
-                    if(!(room in typingUsers)) typingUsers[room] = new Set();
-                    if(!(currentRoom in typingUsers)) typingUsers[currentRoom] = new Set();
-            if (typing) {
+        var typingUsers = {};
+        socket.on("typing", (room, user, typing) => {
+            if(!(room in typingUsers)) typingUsers[room] = new Set();
+            if(!(currentRoom in typingUsers)) typingUsers[currentRoom] = new Set();
+            if(typing) {
                 typingUsers[room].add(user);
             } else {
                 typingUsers[room].delete(user);
             }
             // show users to screen
-                document.getElementById("typing-users").textContent = [...typingUsers[currentRoom]].join(", ");
-                document.getElementById("typing-users").classList.toggle("show-dots", !!typingUsers[currentRoom].size);
+            document.getElementById("typing-users").textContent = [...typingUsers[currentRoom]].join(", ");
+            document.getElementById("typing-users").classList.toggle("show-dots", !!typingUsers[currentRoom].size);
         });
         //gray
         document.getElementById("dark-theme").addEventListener("click", e => {
@@ -487,8 +501,8 @@
             localStorage.theme = "teardownthemeone";
         });
 
-                socket.on('html-message', function(room, id, msg) {
-                    if(room && room != currentRoom) return;
+        socket.on('html-message', function(room, id, msg) {
+            if(room && room != currentRoom) return;
             var item = document.createElement('div');
             item.innerHTML = msg;
             item.dataset.messageId = id;
@@ -505,15 +519,15 @@
         window.addEventListener("beforeunload", e => {
             socket.emit("message", null, username + " Left The Chat. \u{1F44B}");
         });
-        window.alert = msg => { }
+        window.alert = msg => { };
 
         socket.on("delete-message", id => {
             var el = document.querySelector(`#message-container > div[data-message-id="${id}"]`);
-            if (el) el.remove();
+            if(el) el.remove();
         });
 
-            socket.emit("message-history", currentRoom);
-            socket.emit('message', null, `${username} Joined The Chat. \u{1F44B}`);
+        socket.emit("message-history", currentRoom);
+        socket.emit('message', null, `${username} Joined The Chat. \u{1F44B}`);
     </script>
 </body>
 

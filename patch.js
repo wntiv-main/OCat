@@ -17,7 +17,7 @@ var ocat = {
 		if(!matched) callback(undefined, msg);
 	},
 	_decorateName(username) {
-		return `${username}`;
+		return `-${username}-`;
 	},
 	_notification: new Audio(),
 	_currentNotification: null,
@@ -1536,12 +1536,15 @@ roomInput.addEventListener("change", e => {
 	roomInput.value = "";
 	document.getElementById("message-input").focus();
 });
+ocat._roomInput = roomInput;
 roomSelector.appendChild(inputData);
 messageToolbar.prepend(roomSelector);
 
 var ocat_patchGotoRoom = gotoRoom.toString()
 	.replace(/(location\.replace)/g, "if(!location.href || location.href.substring(1) != room) $1")
-	.replace("{", "{ocat._hooks.addChatId(room);");
+	.replace("{", `{
+		ocat._hooks.addChatId(room);
+		ocat._roomInput.placeholder = currentRoom;`);
 gotoRoom = (new Function(`return (${ocat_patchGotoRoom})`))();
 
 document.getElementById("message-input").replaceWith(messageToolbar);
