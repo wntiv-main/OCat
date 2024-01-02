@@ -1551,11 +1551,6 @@ roomSelector.appendChild(roomInput);
 
 var inputData = document.createElement("datalist");
 inputData.id = "ocat-room-selector-data";
-[...ocat.chatIds].forEach(id => {
-	var option = document.createElement("option");
-	option.value = id;
-	inputData.appendChild(option);
-});
 ocat._hooks.addChatId = function(id) {
 	if(!id || ocat._chatIds.has(id)) return;
 	ocat._chatIds.add(id);
@@ -1564,8 +1559,6 @@ ocat._hooks.addChatId = function(id) {
 	option.value = id;
 	inputData.appendChild(option);
 };
-ocat._hooks.addChatId("main");
-ocat._hooks.addChatId(currentRoom);
 roomInput.addEventListener("change", e => {
 	if(!e.currentTarget.value) return;
 	gotoRoom(e.currentTarget.value);
@@ -2082,6 +2075,14 @@ if(ocat._SETTINGS_KEY in localStorage) {
 }
 ocat._SAFE_TO_SAVE = true;
 ocat._saveSettings();
+[...ocat.chatIds].forEach(id => {
+	var option = document.createElement("option");
+	option.text = `#${id}`;
+	option.value = id;
+	inputData.appendChild(option);
+});
+ocat._hooks.addChatId("main");
+ocat._hooks.addChatId(currentRoom);
 
 if(!ocat.notificationSound)
 	ocat.notificationSound = "https://cdn.pixabay.com/download/audio/2023/03/18/audio_900b6765ed.mp3?filename=the-notification-email-143029.mp3";
