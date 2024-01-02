@@ -1874,7 +1874,7 @@ ocat._hooks.onMessageContainer = (el, msg, id, type) => {
 
 patch("message",
 	c => c.toString().includes("finalContent"),
-	c => c.replace(/(?<!function\s*\()msg(?!(?:,\s*[a-zA-Z_0-9]+(?:\s*=(?!>)\s*.*?)?)*\)?\s*=>)/, `
+	c => c.replace(/(?<!function\s*\((?:[a-zA-Z_0-9]+(?:\s*=(?!>)\s*.*?)?,\s*)*)msg(?!(?:,\s*[a-zA-Z_0-9]+(?:\s*=(?!>)\s*.*?)?)*\)?\s*=>)/, `
 		var ocat_prefix = null;
 		ocat._extractUserMessage(msg, function(uname, newMsg) {
 			if(uname) {
@@ -1905,7 +1905,7 @@ patch("message",
 patch("html-message",
 	() => true,
 	c => c
-		.replace(/(?<!function\s*\()msg(?!(?:,\s*[a-zA-Z_0-9]+(?:\s*=(?!>)\s*.*?)?)*\)?\s*=>)/g,
+		.replace(/(?<!function\s*\((?:[a-zA-Z_0-9]+(?:\s*=(?!>)\s*.*?)?,\s*)*)msg(?!(?:,\s*[a-zA-Z_0-9]+(?:\s*=(?!>)\s*.*?)?)*\)?\s*=>)/g,
 			"((ocat.antiXss ? ocat._hooks.antiXss(ocat._hooks.htmlMsg(msg, id)) : ocat._hooks.htmlMsg(msg, id)))")
 		// .replace(/^\s*(function\s*)\(((?:[a-zA-Z_0-9]+(?:\s*=\s*.*?)?),?\s*)*\)/, "$1($2, ocat_id)")
 		// .replace(/^\s*\(?((?:[a-zA-Z_0-9]+(?:\s*=(?!>)\s*.*?)?,?\s*)*)\)?(\s*=>)/, "($1, ocat_id)$2")
