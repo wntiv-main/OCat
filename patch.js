@@ -1057,7 +1057,7 @@ body {
 }
 
 #ocat-member-list li::after {
-	content: attr(data-ocat-room-id);
+	content: "#" attr(data-ocat-room-id);
 	color: #777;
 	font-size: 0.8em;
 	text-transform: uppercase;
@@ -1088,7 +1088,7 @@ body {
 	height: 1em;
 	display: inline-block;
 	background-size: contain;
-	transform: scale(1.2, -1.2);
+	transform: scale(1.2, -1.2) translateY(-33%);
 	margin-right: 0.5em;
 	margin-left: auto;
 	order: 1;
@@ -1750,6 +1750,19 @@ ocat._hooks.updateUserData = (user, data) => {
 			gotoRoom(ocat._userHistory[e.target.textContent]);
 		});
 		el.addEventListener("contextmenu", e => ocat._showContextMenu(e, [
+			{
+				label: `DM ${e.target.textContent}`,
+				action: ((user) => {
+					var msgInput = document.getElementById("message-input");
+					msgInput.value = `/dm ${user} ${msgInput.value}`;
+				}).bind(null, e.target.textContent)
+			},
+			ocat._userHistory[e.target.textContent].room ? {
+				label: `Go to #${ocat._userHistory[e.target.textContent].room}`,
+				action: ((user) => {
+					gotoRoom(ocat._userHistory[user].room);
+				}).bind(null, e.target.textContent)
+			} : null,
 			{
 				label: ocat.blockedUsers.has(e.target.textContent) ? "Unblock" : "Block",
 				action: ((user) => {
