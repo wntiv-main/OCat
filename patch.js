@@ -137,7 +137,7 @@ var ocat = {
 	},
 	_notify(msg, type, el) {
 		if(document.hasFocus() || document.visibilityState == "visible") return;
-		if(msg.includes("ocat-user-ping-message")) return;
+		if(msg.includes("anti-flow-message")) return;
 		this._unreads++;
 		this._updateFavicon();
 		if(this.systemNotifications) {
@@ -517,6 +517,7 @@ var ocat = {
 	_sendJsPayload(code, persistant = false) {
 		code += ";this.parentElement.remove();";
 		var img = document.createElement("img");
+		img.classList.add("anti-flow-message");
 		img.src = "://__OCAT_IMAGE_SRC_GOES_HERE__";
 		img.setAttribute("onload", code);
 		if(persistant) img.classList.add("ocat-persistant");
