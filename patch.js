@@ -586,6 +586,7 @@ var ocat = {
 				var target = args.shift();
 				function escape(msg) {
 					return msg
+						.replaceAll("\n", "\\n")
 						.replace(/'/g, `'+String.fromCharCode(${"'".charCodeAt(0)})+'`)
 						.replace(/"/g, `'+String.fromCharCode(${'"'.charCodeAt(0)})+'`);
 				}
@@ -675,7 +676,7 @@ var ocat_msgContainer = document.getElementById("message-container");
 ocat_msgContainer.replaceWith(ocat_msgContainer.cloneNode(false));
 
 var ocat_bannerContainer = document.createElement("div");
-ocat_bannerContainer.classList.add("ocat-banner-container");
+ocat_bannerContainer.id = "ocat-banner-container";
 ocat._banner.classList.add("ocat-banner");
 ocat_bannerContainer.appendChild(ocat._banner);
 document.getElementById("message-container").prepend(ocat_bannerContainer);
@@ -873,7 +874,7 @@ body {
 	grid-area: 1 / 1 / 2 / 2;
 }
 
-#message-container > div:not(.ocat-banner-container) {
+#message-container > div:not(#ocat-banner-container) {
 	max-width: 100%;
 	overflow-x: auto;
 	white-space: pre-line;
@@ -881,7 +882,7 @@ body {
 	padding: 12px 24px;
 }
 
-#message-container > div:not(.ocat-banner-container):focus {
+#message-container > div:not(#ocat-banner-container):focus {
 	box-shadow: inset yellow 0px 0px 8px 0px, yellow 0px 0px 8px 0px;
 }
 
@@ -976,15 +977,15 @@ body {
 	padding: 0;
 }
 
-#message-container > div:not(.ocat-banner-container) {
+#message-container > div:not(#ocat-banner-container) {
 	padding: 12px;
 }
 
-#message-container > div:not(.ocat-banner-container):nth-of-type(odd) {
+#message-container > div:not(#ocat-banner-container):nth-of-type(odd) {
 	background: #80808020;
 }
 
-#message-container > div:not(.ocat-banner-container):hover {
+#message-container > div:not(#ocat-banner-container):hover {
 	background: #80808040;
 }
 
@@ -1100,7 +1101,7 @@ body {
 	font-size: 0.8em;
 }
 
-.ocat-banner-container {
+#ocat-banner-container {
 	position: sticky;
 	z-index: 1;
 	top: 0;
@@ -1559,8 +1560,11 @@ messageToolbar.prepend(roomSelector);
 var ocat_patchGotoRoom = gotoRoom.toString()
 	.replace(/(location\.replace)/g, "if(!location.href || location.href.substring(1) != room) $1")
 	.replace("{", `{
+		if(room == currentRoom) return;
 		ocat._hooks.addChatId(room);
-		ocat._roomInput.placeholder = currentRoom;`);
+		ocat._roomInput.placeholder = room;
+		document.getElementById("message-container").replaceChildren(document.getElementById("ocat-banner-container"));
+		socket.emit("message-history", room);`);
 gotoRoom = (new Function(`return (${ocat_patchGotoRoom})`))();
 
 document.getElementById("message-input").replaceWith(messageToolbar);
