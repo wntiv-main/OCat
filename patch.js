@@ -1053,17 +1053,19 @@ body {
 	list-style: none;
 	padding: 12px;
 	border-left: 10px solid #aaa;
-	position: relative;
+	display: flex;
 }
 
 #ocat-member-list li::after {
-	content: attr(data-room-id);
-	float: right;
+	content: attr(data-ocat-room-id);
 	color: #777;
 	font-size: 0.8em;
-	position: absolute;
-	right: 12px;
 	text-transform: uppercase;
+	order: 2;
+}
+
+#ocat-member-list li:not(.ocat-typing)::after {
+	margin-left: auto;
 }
 
 #ocat-member-list li:hover::after {
@@ -1086,8 +1088,10 @@ body {
 	height: 1em;
 	display: inline-block;
 	background-size: contain;
-	transform: scale(2, -2) translateY(-4px);
-	margin: 0 1em 0 0.5em;
+	transform: scale(1.2, -1.2);
+	margin-right: 0.5em;
+	margin-left: auto;
+	order: 1;
 	filter: invert(1) brightness(0.5) blur(0.3px);
 }
 
