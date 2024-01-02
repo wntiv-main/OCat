@@ -2077,7 +2077,7 @@ ocat._SAFE_TO_SAVE = true;
 ocat._saveSettings();
 [...ocat.chatIds].forEach(id => {
 	var option = document.createElement("option");
-	option.text = `#${id}`;
+	// option.text = `#${id}`;
 	option.value = id;
 	inputData.appendChild(option);
 });
