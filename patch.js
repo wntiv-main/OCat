@@ -1574,7 +1574,8 @@ var ocat_patchGotoRoom = gotoRoom.toString()
 		ocat._hooks.addChatId(room);
 		ocat._roomInput.placeholder = room;
 		document.getElementById("message-container").replaceChildren(document.getElementById("ocat-banner-container"));
-		socket.emit("message-history", room);`);
+		socket.emit("message-history", room);
+		ocat._hooks.updateUserData(username, { room: room });`);
 gotoRoom = (new Function(`return (${ocat_patchGotoRoom})`))();
 
 document.getElementById("message-input").replaceWith(messageToolbar);
