@@ -1585,8 +1585,7 @@ const ocat_classMap = {
 	"light-theme": "lightmode",
 	"udark-theme": "ultradarkmode",
 };
-[...document.querySelectorAll(".right.sidebar button.themebutton"),
-	...document.querySelectorAll(".right.sidebar button.button")].forEach(el => {
+[...document.querySelectorAll(".right.sidebar button.themebutton")].forEach(el => {
 		// theme button
 		var themeClass = ocat_classMap[el.id]
 			|| el.id.replace(/-theme(\d*)$/, (/\b\w*mode\d*\b/i.test(el.className) ? "mode$1" : "theme$1"))
