@@ -72,7 +72,7 @@ var ocat = {
 		}
 		var img = new Image();
 		img.addEventListener("load", function(e) {
-			ocat._favicon = e.target;
+			ocat._favicon = e.currentTarget;
 			callback(ocat._favicon);
 		});
 		img.src = favicon;
@@ -242,7 +242,7 @@ var ocat = {
 			itemEl.addEventListener("click", function(e) {
 				e.stopPropagation();
 				item.action(e);
-				e.target.parentElement.remove();
+				e.currentTarget.parentElement.remove();
 			});
 			contextMenuContainer.appendChild(itemEl);
 		});
@@ -287,7 +287,7 @@ var ocat = {
 	_fileError(e) {
 		this._clientMessage("Could not load file");
 		if(this.devMessages) {
-			this._clientMessage(`Error: ${e.target.errorCode}`);
+			this._clientMessage(`Error: ${e.currentTarget.errorCode}`);
 		}
 	},
 	_dbUnsafe: 0,
@@ -300,9 +300,9 @@ var ocat = {
 				this._clientMessage("Another tab is stopping this one from updating");
 			};
 			request.onupgradeneeded = e => {
-				const db = e.target.result;
+				const db = e.currentTarget.result;
 				db.onversionchange = e => {
-					e.target.close();
+					e.currentTarget.close();
 					this._clientMessage("A new version of this page is ready. Please reload or close this tab!");
 				};
 				if(!db.objectStoreNames.contains("files")) {
@@ -315,7 +315,7 @@ var ocat = {
 				while(this._dbUnsafe) { }
 			};
 			request.onsuccess = e => {
-				this._database = e.target.result;
+				this._database = e.currentTarget.result;
 				if(!this._database.objectStoreNames.contains("files")) {
 					this._dbUnsafe++;
 					var req = indexedDB.deleteDatabase("ocat-db");
@@ -324,7 +324,7 @@ var ocat = {
 					};
 				}
 				this._database.onversionchange = e => {
-					e.target.close();
+					e.currentTarget.close();
 					this._clientMessage("A new version of this page is ready. Please reload or close this tab!");
 				};
 				this._database.onerror = this._fileError;
@@ -355,7 +355,7 @@ var ocat = {
 				.objectStore("files")
 				.get(key)
 				.onsuccess = e => {
-					callback(e.target.result.blob);
+					callback(e.currentTarget.result.blob);
 				};
 		});
 	},
@@ -372,7 +372,7 @@ var ocat = {
 				.objectStore("files")
 				.openCursor()
 				.onsuccess = e => {
-					const cursor = e.target.result;
+					const cursor = e.currentTarget.result;
 					if(cursor) {
 						if(!cursor.value.icon) {
 							this._removeFile(cursor.value.hash);
@@ -405,7 +405,7 @@ var ocat = {
 				document.body.style.setProperty("--ocat-custom-background", `url("${this._themeUrl}")`);
 				var img = new Image();
 				img.addEventListener("load", e => {
-					if(this._isLight(e.target)) {
+					if(this._isLight(e.currentTarget)) {
 						// light background, light mode
 						document.body.classList.remove("ocat-dark-style");
 					} else {
@@ -475,7 +475,7 @@ var ocat = {
 					action() {
 						ocat._removeFile(hash);
 						URL.revokeObjectURL(iconUrl);
-						e.target.remove();
+						e.currentTarget.remove();
 					}
 				}
 			]);
@@ -1448,7 +1448,7 @@ messageInput.id = "message-input";
 messageInput.setAttribute("rows", 1);
 messageInput.setAttribute("spellcheck", false);
 messageInput.addEventListener("input", e => {
-	e.target.parentNode.dataset.replicatedValue = e.target.value;
+	e.currentTarget.parentNode.dataset.replicatedValue = e.currentTarget.value;
 });
 messageInput.addEventListener("keypress", e => {
 	if(!ocat.silentTyping) {
@@ -1457,10 +1457,10 @@ messageInput.addEventListener("keypress", e => {
 		typingIdle = setTimeout(() => socket.emit("typing", currentRoom, username, false), 3e3);
 	}
 	if(e.key == "Enter" && !(e.ctrlKey || e.shiftKey)) {
-		if(e.target.value) {
-			ocat._hooks.send(e.target.value);
-			e.target.value = "";
-			e.target.parentElement.dataset.replicatedValue = "";
+		if(e.currentTarget.value) {
+			ocat._hooks.send(e.currentTarget.value);
+			e.currentTarget.value = "";
+			e.currentTarget.parentElement.dataset.replicatedValue = "";
 			if(!ocat.silentTyping) socket.emit("typing", currentRoom, username, false);
 		};
 		e.preventDefault();
@@ -1488,7 +1488,7 @@ if(!nameInput) {
 	nameInput = document.createElement("input");
 	nameInput.value = username;
 	nameInput.addEventListener("change", e => {
-		username = e.target.value;
+		username = e.currentTarget.value;
 		localStorage.username = username;
 	});
 }
@@ -1498,7 +1498,7 @@ nameInput.setAttribute("spellcheck", false);
 nameInput.addEventListener("change", e => {
 	if(ocat._oldUsername in ocat._userHistory) {
 		ocat._userHistory[ocat._oldUsername].element.remove();
-		ocat._hooks.updateUserData(e.target.value, {
+		ocat._hooks.updateUserData(e.currentTarget.value, {
 			room: currentRoom,
 			online: ocat._userHistory[ocat._oldUsername].online,
 		});
@@ -1542,8 +1542,8 @@ ocat._hooks.addChatId = function(id) {
 };
 ocat._hooks.addChatId("main");
 roomInput.addEventListener("change", e => {
-	if(!e.target.value) return;
-	gotoRoom(e.target.value);
+	if(!e.currentTarget.value) return;
+	gotoRoom(e.currentTarget.value);
 	roomInput.value = "";
 	document.getElementById("message-input").focus();
 });
@@ -1582,7 +1582,7 @@ themeSelectorTooltipContainer.classList.add("ocat-tooltip");
 var themeSelectorTooltip = document.createElement("div");
 themeSelectorTooltip.classList.add("ocat-grid");
 themeSelectorTooltip.addEventListener("scroll", e => {
-	e.target.style.setProperty("--ocat-theme-scroll", `${e.target.scrollLeft}px`);
+	e.currentTarget.style.setProperty("--ocat-theme-scroll", `${e.currentTarget.scrollLeft}px`);
 });
 
 themeSelector.addEventListener("click", e => {
@@ -1652,7 +1652,7 @@ customThemeButton.addEventListener("change", function(e) {
 			} else {
 				vPad = (img.naturalHeight - img.naturalWidth) / 2;
 			}
-			ocat_iconContext.drawImage(e.target, hPad, vPad, img.naturalWidth - 2 * hPad, img.naturalHeight - 2 * vPad, 0, 0, 32, 32);
+			ocat_iconContext.drawImage(e.currentTarget, hPad, vPad, img.naturalWidth - 2 * hPad, img.naturalHeight - 2 * vPad, 0, 0, 32, 32);
 			ocat_iconCanvas.convertToBlob().then(icon => {
 				ocat._addFile(blob, icon, function(hash) {
 					var result = callback(hash, icon);
@@ -1696,7 +1696,7 @@ randomThemeButton.classList.add("ocat-settings-button");
 randomThemeButton.id = "ocat-random-theme-button";
 randomThemeButton.addEventListener("click", function(e) {
 	e.stopPropagation();
-	var buttons = [...e.target.parentElement.querySelectorAll(":scope .ocat-theme-button")];
+	var buttons = [...e.currentTarget.parentElement.querySelectorAll(":scope .ocat-theme-button")];
 	buttons[Math.floor(Math.random() * buttons.length)].click();
 });
 themeSelectorTooltip.appendChild(randomThemeButton);
@@ -1745,29 +1745,29 @@ ocat._hooks.updateUserData = (user, data) => {
 			element: el,
 		};
 		el.addEventListener("click", e => {
-			gotoRoom(ocat._userHistory[e.target.textContent]);
+			gotoRoom(ocat._userHistory[e.currentTarget.textContent]);
 		});
 		el.addEventListener("contextmenu", e => ocat._showContextMenu(e, [
 			{
-				label: `DM ${e.target.textContent}`,
+				label: `DM ${e.currentTarget.textContent}`,
 				action: ((user) => {
 					var msgInput = document.getElementById("message-input");
 					msgInput.value = `/dm ${user} ${msgInput.value}`;
-				}).bind(null, e.target.textContent)
+				}).bind(null, e.currentTarget.textContent)
 			},
-			ocat._userHistory[e.target.textContent].room ? {
-				label: `Go to #${ocat._userHistory[e.target.textContent].room}`,
+			ocat._userHistory[e.currentTarget.textContent].room ? {
+				label: `Go to #${ocat._userHistory[e.currentTarget.textContent].room}`,
 				action: ((user) => {
 					gotoRoom(ocat._userHistory[user].room);
-				}).bind(null, e.target.textContent)
+				}).bind(null, e.currentTarget.textContent)
 			} : null,
 			{
-				label: ocat.blockedUsers.has(e.target.textContent) ? "Unblock" : "Block",
+				label: ocat.blockedUsers.has(e.currentTarget.textContent) ? "Unblock" : "Block",
 				action: ((user) => {
 					if(!ocat.blockedUsers.delete(user)) {
 						ocat.blockedUsers.add(user);
 					}
-				}).bind(null, e.target.textContent)
+				}).bind(null, e.currentTarget.textContent)
 			}
 		]));
 		memberList.appendChild(el);
@@ -1954,18 +1954,18 @@ ocat._hooks.onMessageContainer = (el, msg, id, type) => {
 				el.addEventListener("keypress", e => {
 					if(e.key == "Enter" && !(e.ctrlKey || e.shiftKey)) {
 						el.removeAttribute("contenteditable");
-						ocat._editMessage(e.target.dataset.messageId, el.innerHTML);
+						ocat._editMessage(e.currentTarget.dataset.messageId, el.innerHTML);
 						e.preventDefault();
 					}
 				});
-			}).bind(null, e.target)
+			}).bind(null, e.currentTarget)
 		},
 		{
 			label: "Delete",
 			classes: ["ocat-important-action"],
 			action: ((id) => {
 				ocat._deleteMessage(id);
-			}).bind(null, e.target.dataset.messageId)
+			}).bind(null, e.currentTarget.dataset.messageId)
 		}
 	]));
 	ocat._notify(msg, type, el);
