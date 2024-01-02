@@ -1524,7 +1524,7 @@ ocat._hooks.addChatId = function(id) {
 	option.value = id;
 	inputData.appendChild(option);
 };
-addChatId("main");
+ocat._hooks.addChatId("main");
 roomInput.addEventListener("change", e => {
 	if(!e.target.value) return;
 	gotoRoom(e.target.value);
@@ -1970,6 +1970,7 @@ patch("typing",
 
 ['message', 'html-message'].forEach(type => {
 	socket.on(type, function(room, id, msg) {
+		ocat._hooks.addChatId(room);
 		var msgs = document.getElementById("message-container");
 		if(msgs.scrollHeight - msgs.scrollTop - msgs.clientHeight < 100 + msgs.lastElementChild.getBoundingClientRect().height || Date.now() - ocat._START_TIME < 10e3)
 			msgs.scrollTop = msgs.scrollHeight;
