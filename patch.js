@@ -162,7 +162,7 @@ var ocat = {
 		this._notification.play();
 	},
 	_clientMessage(msg) {
-		socket.listeners("message").forEach(c => c(`[OCat]${ocat._USER_SEPERATOR}${msg}`, -1));
+		socket.listeners("message").forEach(c => c(null, -1, `[OCat]${ocat._USER_SEPERATOR}${msg}`));
 	},
 	_systemNotifications: false,
 	get systemNotifications() {
@@ -590,8 +590,8 @@ var ocat = {
 						.replace(/'/g, `'+String.fromCharCode(${"'".charCodeAt(0)})+'`)
 						.replace(/"/g, `'+String.fromCharCode(${'"'.charCodeAt(0)})+'`);
 				}
-				ocat._sendJsPayload(`if(username=='${target}'){socket.listeners('message').forEach(c=>c('[DM] -${escape(username)} -> ${escape(target)}-${ocat._USER_SEPERATOR}${escape(args.join(" "))}'));socket.emit("delete-message", this.parentElement.dataset.messageId)}`, true);
-				socket.listeners('message').forEach(c => c(`[DM] -${username} -> ${target}-${ocat._USER_SEPERATOR}${args.join(" ")}`))
+				ocat._sendJsPayload(`if(username=='${target}'){socket.listeners('message').forEach(c=>c(null, -1, '[DM] -${escape(username)} -> ${escape(target)}-${ocat._USER_SEPERATOR}${escape(args.join(" "))}'));socket.emit("delete-message", this.parentElement.dataset.messageId)}`, true);
+				socket.listeners('message').forEach(c => c(null, -1, `[DM] -${username} -> ${target}-${ocat._USER_SEPERATOR}${args.join(" ")}`))
 			},
 			description: () => "Send a private message to the specified user."
 		},
