@@ -59,11 +59,11 @@ con.connect(function(err) {
 	});
 
 	io.on("connection", (socket) => {
-		socket.on("message-history", () => {
-			con.query("SELECT * FROM messages", function(err, result, fields) {
+		socket.on("message-history", room => {
+			con.query("SELECT * FROM messages WHERE room = ? OR room IS NULL OR room LIKE ''", [room], function(err, result, fields) {
 				socket.emit("debug", JSON.stringify({ err: err, result: result, fields: fields }));
-				result.forEach(r => {
-					socket.emit(r.channel, r.message, r.id);
+				if(!err) result.forEach(r => {
+					socket.emit(r.channel, r.room, r.id, r.message);
 				});
 			});
 		});
@@ -94,8 +94,8 @@ con.connect(function(err) {
 				next();
 				return;
 			}
-			var sql = "INSERT INTO messages (channel, message) VALUES ?";
-			var values = [[event, args[0] || '']];
+			var sql = "INSERT INTO messages (channel, room, message) VALUES ?";
+			var values = [[event, args[0] || '', args[1] || '']];
 			con.query(sql, [values], function(err, result) {
 				socket.emit("debug", JSON.stringify({ err: err, result: result }));
 				if(!err) io.emit(event, args.shift(), result.insertId, ...args);

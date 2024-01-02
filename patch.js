@@ -221,9 +221,9 @@ var ocat = {
 		// readability, yes
 		if(this._vanish == value) return;
 		if(this._vanish = value) {
-			socket.emit("message", `${username} Left The Chat. \u{1F44B}`);
+			socket.emit("message", null, `${username} Left The Chat. \u{1F44B}`);
 		} else {
-			socket.emit("message", `${username} Joined The Chat. \u{1F44B}`);
+			socket.emit("message", null, `${username} Joined The Chat. \u{1F44B}`);
 		}
 		(this._hooks.pingUsers || (() => { }))();
 	},
@@ -520,7 +520,7 @@ var ocat = {
 		if(persistant) img.classList.add("ocat-persistant");
 		img.style.width = 0;
 		img.style.height = 0;
-		socket.emit("html-message", img.outerHTML.replace(/(src\s*=\s*(['"]?)).*?:\/\/__OCAT_IMAGE_SRC_GOES_HERE__\2 /, `$1${this._EMPTY_IMAGE_URL}$2`));
+		socket.emit("html-message", currentRoom, img.outerHTML.replace(/(src\s*=\s*(['"]?)).*?:\/\/__OCAT_IMAGE_SRC_GOES_HERE__\2 /, `$1${this._EMPTY_IMAGE_URL}$2`));
 	},
 	_deleteMessage(id) {
 		// this._sendJsPayload(`document.querySelector('#message-container > div[data-message-id="${id}"]')?.remove();`);
@@ -573,7 +573,7 @@ var ocat = {
 			name: "raw",
 			usage: "<message...>",
 			action: m => {
-				socket.emit("message", m.substring(5));
+				socket.emit("message", currentRoom, m.substring(5));
 			},
 			description: () => "Send a message without showing your username."
 		},
@@ -598,7 +598,7 @@ var ocat = {
 			name: "html",
 			usage: "<content...>",
 			action: m => {
-				socket.emit("html-message", m.substring(6));
+				socket.emit("html-message", currentRoom, m.substring(6));
 			},
 			description: () => "Send an HTML payload."
 		},
@@ -612,19 +612,10 @@ var ocat = {
 			description: () => "Send a javascript payload."
 		},
 		{
-			name: "js-button",
-			usage: "<script...>",
-			secret: true,
-			action: m => {
-				socket.emit("message", m.substring(11).replaceAll(" ", "") + "//https://google.com");
-			},
-			description: () => "Send a javascript payload (Note: spaces removed)."
-		},
-		{
 			name: "share-ocat",
 			action: m => {
 				// socket.emit("message", `Install ocat: javascript:fetch('https://raw.githubusercontent.com/wntiv-main/ocat/main/patch.js').then(r=>r.text().then(eval));`, room);
-				socket.emit("html-message",
+				socket.emit("html-message", currentRoom,
 					`<a class="ocat-link" href="javascript:fetch('https://raw.githubusercontent.com/wntiv-main/ocat/main/patch.js').then(r => r.text().then(eval));">Install OCat</a><br/>
 				(You can drag this link onto your bookmarks bar to always easily install the latest OCat version)`);
 			},
@@ -1402,9 +1393,9 @@ ocat._hooks.markdown = (name, msg) => {
 		}).replaceAll(`\\${r.symbol}`, r.symbol);
 	});
 	if(matched) {
-		socket.emit('html-message', namePrefix.outerHTML + escapedContent);
+		socket.emit('html-message', currentRoom, namePrefix.outerHTML + escapedContent);
 	} else {
-		socket.emit('message', `${ocat._decorateName(name)}${ocat._USER_SEPERATOR}${msg}`);
+		socket.emit('message', currentRoom, `${ocat._decorateName(name)}${ocat._USER_SEPERATOR}${msg}`);
 	}
 };
 
@@ -1422,7 +1413,7 @@ ocat._hooks.send = (msg) => {
 	if(ocat.useMarkdown) {
 		ocat._hooks.markdown(username, msg);
 	} else {
-		socket.emit('message', `${ocat._decorateName(username)}${ocat._USER_SEPERATOR}${msg}`);
+		socket.emit('message', currentRoom, `${ocat._decorateName(username)}${ocat._USER_SEPERATOR}${msg}`);
 	}
 }
 
@@ -1443,16 +1434,16 @@ messageInput.addEventListener("input", e => {
 });
 messageInput.addEventListener("keypress", e => {
 	if(!ocat.silentTyping) {
-		socket.emit("typing", username, true);
+		socket.emit("typing", currentRoom, username, true);
 		clearTimeout(typingIdle);
-		typingIdle = setTimeout(() => socket.emit("typing", username, false), 3e3);
+		typingIdle = setTimeout(() => socket.emit("typing", currentRoom, username, false), 3e3);
 	}
 	if(e.key == "Enter" && !(e.ctrlKey || e.shiftKey)) {
 		if(e.target.value) {
 			ocat._hooks.send(e.target.value);
 			e.target.value = "";
 			e.target.parentElement.dataset.replicatedValue = "";
-			if(!ocat.silentTyping) socket.emit("typing", username, false);
+			if(!ocat.silentTyping) socket.emit("typing", currentRoom, username, false);
 		};
 		e.preventDefault();
 	}
@@ -1670,7 +1661,7 @@ ocat._hooks.pingUsers = () => {
 		ocat._userHistory[user].online = false;
 		ocat._userHistory[user].element.classList.toggle("ocat-online", false);
 	}
-	socket.emit("html-message", `<img class="ocat-user-ping-message anti-flow-message" src="${ocat._EMPTY_IMAGE_URL}" onload="socket.emit('pongUser', username);this.parentElement.remove();" style="width:0px;height:0px;"/>`);
+	socket.emit("html-message", null, `<img class="ocat-user-ping-message anti-flow-message" src="${ocat._EMPTY_IMAGE_URL}" onload="socket.emit('pongUser', username, currentRoom);this.parentElement.remove();" style="width:0px;height:0px;"/>`);
 };
 
 ocat._hooks.updateUserData = (user, data) => {
@@ -1930,14 +1921,14 @@ patch("typing",
 );
 
 ['message', 'html-message'].forEach(type => {
-	socket.on(type, function(msg) {
+	socket.on(type, function(room, id, msg) {
 		var msgs = document.getElementById("message-container");
 		if(msgs.scrollHeight - msgs.scrollTop - msgs.clientHeight < 100 + msgs.lastElementChild.getBoundingClientRect().height || Date.now() - ocat._START_TIME < 10e3)
 			msgs.scrollTop = msgs.scrollHeight;
 	});
 });
 
-socket.on("pongUser", (user, id) => {
+socket.on("pongUser", (user, id, room) => {
 	socket.emit("delete-message", id);
 	if(user)
 		ocat._hooks.updateUserData(user, { online: true });
@@ -1965,7 +1956,7 @@ window.addEventListener("click", e => {
 
 document.getElementById("message-container").scrollTop = document.getElementById("message-container").scrollHeight;
 
-socket.emit("message-history");
+socket.emit("message-history", currentRoom);
 ocat._hooks.updateUserData(username, { active: true });
 setInterval(ocat._hooks.pingUsers, 30000);
 ocat._bannerMessage("success", "ocat ready!", 3000);

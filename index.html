@@ -20,18 +20,19 @@
             width: 69%;
             height: 20px;
             position: fixed;
-            bottom: 0em;
+            bottom: 5px;
             left: 5em;
             border-radius: 50px;
         }
 
         #message-container > div {
-            border: 1px solid green; /* or whatever you want */
+            margin-bottom: 10px;
             width: 73%;
+            white-space: pre-line;
         }
 
         #message-container {
-            padding-bottom: 3em;
+            padding-bottom: 4em;
             padding-left: 4em;
         }
 
@@ -50,7 +51,8 @@
             position: fixed;
             bottom: 1.8em;
             left: 5em;
-            background-color: black;
+            backdrop-filter: blur(100px);
+            bottom: 2.5em;
         }
 
         #message-container > div:has(> .anti-flow-message) {
@@ -173,7 +175,7 @@
 
         .left-sidebar {
             position: fixed;
-            width: 4%;
+            width: 4em;
             height: 100%;
             left: 0px;
             top: 0px;
@@ -255,12 +257,13 @@
 </head>
 
 <body>
+    
     <div class="left-sidebar">
-    
+
         <button class="button" id="home-button">hello</button>
-    
+
     </div>
-    
+
     <div class="right sidebar">
 
         <h1>Welcome To CCat</h1>
@@ -330,6 +333,12 @@
     <div id="typing-users"></div>
     <input id="message-input" />
     <script>
+            function gotoRoom(room) {
+                location.replace(`#${room}`);
+                socket.emit("typing", currentRoom, username, false);
+                currentRoom = room;
+            }
+            var currentRoom = location.hash ? location.hash.substring(1) : (location.replace('#main'), 'main');
         var typingIdle = -1;
         if (!("username" in localStorage)) {
             localStorage.username = prompt("Enter your username:");
@@ -341,7 +350,8 @@
 
         const socket = io();
         socket.on('message', console.log);
-        socket.on("message", (msg, id) => {
+            socket.on("message", (room, id, msg) => {
+                if(room && room != currentRoom) return;
             var finalContent = [];
             msg.split(" ").forEach((v, i) => {
                 if (i) {
@@ -373,32 +383,33 @@
         });
 
         document.getElementById("message-input").addEventListener("keypress", e => {
-            socket.emit("typing", username, !!e.target.value);
+            socket.emit("typing", currentRoom, username, !!e.target.value);
             clearTimeout(typingIdle);
-            typingIdle = setTimeout(() => socket.emit("typing", username, false), 3e3);
+            typingIdle = setTimeout(() => socket.emit("typing", currentRoom, username, false), 3e3);
             if (e.key == "Enter") {
-                socket.emit("typing", username, false);
+                socket.emit("typing", currentRoom, username, false);
                 if (e.target.value == "/help") {
                     socket.listeners("message").forEach(c => c(
                         `Help: /help: Show this menu.`));
                     e.target.value = "";
                     return;
                 }
-                socket.emit("message", `${username}: ${e.target.value}`);
+                socket.emit("message", currentRoom, `-${username}-\n ${e.target.value}`);
                 e.target.value = "";
             }
         });
 
-        var typingUsers = new Set();
-        socket.on("typing", (user, typing) => {
+                var typingUsers = {};
+                socket.on("typing", (room, user, typing) => {
+                    if(!(room in typingUsers)) typingUsers[room] = new Set();
             if (typing) {
-                typingUsers.add(user);
+                typingUsers[room].add(user);
             } else {
-                typingUsers.delete(user);
+                typingUsers[room].delete(user);
             }
             // show users to screen
-            document.getElementById("typing-users").textContent = [...typingUsers].join(", ");
-            document.getElementById("typing-users").classList.toggle("show-dots", !!typingUsers.size);
+                document.getElementById("typing-users").textContent = [...typingUsers[currentRoom]].join(", ");
+                document.getElementById("typing-users").classList.toggle("show-dots", !!typingUsers[currentRoom].size);
         });
         //gray
         document.getElementById("dark-theme").addEventListener("click", e => {
@@ -475,7 +486,8 @@
             localStorage.theme = "teardownthemeone";
         });
 
-        socket.on('html-message', function (msg, id) {
+                socket.on('html-message', function(room, id, msg) {
+                    if(room && room != currentRoom) return;
             var item = document.createElement('div');
             item.innerHTML = msg;
             item.dataset.messageId = id;
@@ -490,7 +502,7 @@
         });
         //leave messages
         window.addEventListener("beforeunload", e => {
-            socket.emit("message", username + " left the chat");
+            socket.emit("message", null, username + " Left The Chat. \u{1F44B}");
         });
         window.alert = msg => { }
 
@@ -499,8 +511,8 @@
             if (el) el.remove();
         });
 
-        socket.emit("message-history");
-        socket.emit('message', `${username} Joined The Chat.`);
+            socket.emit("message-history", currentRoom);
+            socket.emit('message', null, `${username} Joined The Chat. \u{1F44B}`);
     </script>
 </body>
 
