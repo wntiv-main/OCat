@@ -1496,26 +1496,26 @@ nameSelector.appendChild(nameInput);
 messageToolbar.prepend(nameSelector);
 
 var roomSelector = document.createElement("label");
-roomSelector.classList.add("opal-input-container");
-roomSelector.classList.add("opal-room-selector");
-roomSelector.setAttribute("for", "opal-room-selector");
+roomSelector.classList.add("ocat-input-container");
+roomSelector.classList.add("ocat-room-selector");
+roomSelector.setAttribute("for", "ocat-room-selector");
 
 var roomPrefix = document.createElement("span");
 roomPrefix.textContent = "#";
-roomPrefix.classList.add("opal-prefix");
+roomPrefix.classList.add("ocat-prefix");
 roomSelector.appendChild(roomPrefix);
 
 var roomInput = document.createElement("input");
 roomInput.type = "text";
 roomInput.placeholder = currentRoom;
 roomInput.value = "";
-roomInput.id = "opal-room-selector";
+roomInput.id = "ocat-room-selector";
 roomInput.setAttribute("spellcheck", false);
-roomInput.setAttribute("list", "opal-room-selector-data");
+roomInput.setAttribute("list", "ocat-room-selector-data");
 roomSelector.appendChild(roomInput);
 
 var inputData = document.createElement("datalist");
-inputData.id = "opal-room-selector-data";
+inputData.id = "ocat-room-selector-data";
 ocat._chatIds = new Set();
 ocat._hooks.addChatId = function(id) {
 	if(ocat._chatIds.has(id)) return;
