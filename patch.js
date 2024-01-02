@@ -1550,6 +1550,11 @@ roomSelector.appendChild(roomInput);
 
 var inputData = document.createElement("datalist");
 inputData.id = "ocat-room-selector-data";
+[...ocat.chatIds].forEach(id => {
+	var option = document.createElement("option");
+	option.value = id;
+	inputData.appendChild(option);
+});
 ocat._hooks.addChatId = function(id) {
 	if(!id || ocat._chatIds.has(id)) return;
 	ocat._chatIds.add(id);
@@ -1559,6 +1564,7 @@ ocat._hooks.addChatId = function(id) {
 	inputData.appendChild(option);
 };
 ocat._hooks.addChatId("main");
+ocat._hooks.addChatId(currentRoom);
 roomInput.addEventListener("change", e => {
 	if(!e.currentTarget.value) return;
 	gotoRoom(e.currentTarget.value);
