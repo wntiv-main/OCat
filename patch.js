@@ -1529,7 +1529,7 @@ roomInput.addEventListener("change", e => {
 	if(!e.target.value) return;
 	gotoRoom(e.target.value);
 	roomInput.value = "";
-	document.getElementById("input").focus();
+	document.getElementById("message-input").focus();
 });
 roomSelector.appendChild(inputData);
 messageToolbar.prepend(roomSelector);
