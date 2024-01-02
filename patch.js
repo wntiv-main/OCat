@@ -537,6 +537,14 @@ var ocat = {
 		if(value instanceof Array) value = new Set(value);
 		this._blockedUsers = value;
 	},
+	_chatIds: new Set(),
+	get chatIds() {
+		return this._chatIds;
+	},
+	set chatIds(value) {
+		if(value instanceof Array) value = new Set(value);
+		this._chatIds = value;
+	},
 	_hooks: {},
 	_xssIds: {},
 	_userHistory: {},
@@ -1532,9 +1540,8 @@ roomSelector.appendChild(roomInput);
 
 var inputData = document.createElement("datalist");
 inputData.id = "ocat-room-selector-data";
-ocat._chatIds = new Set();
 ocat._hooks.addChatId = function(id) {
-	if(ocat._chatIds.has(id)) return;
+	if(!id || ocat._chatIds.has(id)) return;
 	ocat._chatIds.add(id);
 	var option = document.createElement("option");
 	option.value = id;
