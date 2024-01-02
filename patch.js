@@ -5,6 +5,7 @@ var ocat = {
 	_START_TIME: Date.now(),
 	_EMPTY_IMAGE_URL: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAA1JREFUGFdjYGBkZAAAAAoAAx9k7/gAAAAASUVORK5CYII=",
 	_USER_SEPERATOR: "\n",
+	_SAFE_TO_SAVE: false,
 	_extractUserMessage(msg, callback) {
 		var matched = false;
 		msg.replace(/^(?:-?(?<username>.*?)-?(?:\n|: ))?(?<message>(?:.|\n)*)$/, (...args) => {
@@ -499,6 +500,7 @@ var ocat = {
 	},
 	_SETTINGS_KEY: "ocatSettingsStorage",
 	_saveSettings() {
+		if(!this._SAFE_TO_SAVE) return;
 		var settings = {};
 		for(var key in this) {
 			if(!key.startsWith("_")) {
@@ -2071,6 +2073,8 @@ if(ocat._SETTINGS_KEY in localStorage) {
 		}
 	}
 }
+ocat._SAFE_TO_SAVE = true;
+ocat._saveSettings();
 
 if(!ocat.notificationSound)
 	ocat.notificationSound = "https://cdn.pixabay.com/download/audio/2023/03/18/audio_900b6765ed.mp3?filename=the-notification-email-143029.mp3";
