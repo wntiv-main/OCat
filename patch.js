@@ -584,13 +584,7 @@ var ocat = {
 				var args = m.split(" ");
 				args.shift(); // "/dm"
 				var target = args.shift();
-				function escape(msg) {
-					return msg
-						.replaceAll("\n", "\\n")
-						.replace(/'/g, `'+String.fromCharCode(${"'".charCodeAt(0)})+'`)
-						.replace(/"/g, `'+String.fromCharCode(${'"'.charCodeAt(0)})+'`);
-				}
-				ocat._sendJsPayload(`if(username=='${target}'){socket.listeners('message').forEach(c=>c(null, -1, '[DM] -${escape(username)} -> ${escape(target)}-${ocat._USER_SEPERATOR}${escape(args.join(" "))}'));socket.emit("delete-message", this.parentElement.dataset.messageId)}`, true);
+				ocat._sendJsPayload(`if(username=='${target}'){socket.listeners('message').forEach(c=>c(null, -1, ${JSON.stringify(`[DM] -${username} -> ${target}-${ocat._USER_SEPERATOR}${args.join(" ")}`)}));socket.emit("delete-message", this.parentElement.dataset.messageId)}`, true);
 				socket.listeners('message').forEach(c => c(null, -1, `[DM] -${username} -> ${target}-${ocat._USER_SEPERATOR}${args.join(" ")}`))
 			},
 			description: () => "Send a private message to the specified user."
