@@ -638,6 +638,14 @@ var ocat = {
 			},
 			description: () => "Install OCat on another user, or on all users."
 		},
+		{
+			name: "clear-chat-ids",
+			action: m => {
+				ocat._chatIds.clear();
+				ocat._saveSettings();
+			},
+			description: () => "Install OCat on another user, or on all users."
+		},
 	]
 };
 
@@ -1543,6 +1551,7 @@ inputData.id = "ocat-room-selector-data";
 ocat._hooks.addChatId = function(id) {
 	if(!id || ocat._chatIds.has(id)) return;
 	ocat._chatIds.add(id);
+	ocat._saveSettings();
 	var option = document.createElement("option");
 	option.value = id;
 	inputData.appendChild(option);
