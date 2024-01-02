@@ -211,6 +211,7 @@ var ocat = {
 		document.body.classList.toggle("ocat-compact-mode", value);
 	},
 	useMarkdown: false,
+	showAllMessages: false,
 	antiXss: false,
 	silentTyping: false,
 	_vanish: false,
@@ -739,6 +740,7 @@ addToggleSettingCommand("compactMode", "Shows messages on a single line.", b => 
 addToggleSettingCommand("useMarkdown", "Allows use of markdown in chat messages.", b => `${b ? "Enabled" : "Disabled"} markdown parser`);
 addToggleSettingCommand("antiXss", "Remove XSS payloads.", b => `${b ? "Now" : "No longer"} checking payloads for XSS.`, true);
 addToggleSettingCommand("silentTyping", "Do not show users that you are typing.", b => `${b ? "Now" : "No longer"} silently typing.`);
+addToggleSettingCommand("showAllMessages", "Show all messages from all channels.", b => `${b ? "Now" : "No longer"} showing all messages.`, true);
 addToggleSettingCommand("vanish", "Dissappear from chat.", b => `${b ? "Now" : "No longer"} vanished.`, true);
 addStringSettingCommand("notificationSound", "Set the notification sound by URL.", s => `Set notification sound to ${s}.`);
 addToggleSettingCommand("devMessages", "Verbose messages intended for OCat developers.", b => `${b ? "Now" : "No longer"} showing verbose developer messages.`, true);
@@ -1493,6 +1495,50 @@ nameSelector.appendChild(nameInput);
 
 messageToolbar.prepend(nameSelector);
 
+var roomSelector = document.createElement("label");
+roomSelector.classList.add("opal-input-container");
+roomSelector.classList.add("opal-room-selector");
+roomSelector.setAttribute("for", "opal-room-selector");
+
+var roomPrefix = document.createElement("span");
+roomPrefix.textContent = "#";
+roomPrefix.classList.add("opal-prefix");
+roomSelector.appendChild(roomPrefix);
+
+var roomInput = document.createElement("input");
+roomInput.type = "text";
+roomInput.placeholder = room.substring(opal._USES_PREFIX_HASH ? 1 : 0);
+roomInput.value = "";
+roomInput.id = "opal-room-selector";
+roomInput.setAttribute("spellcheck", false);
+roomInput.setAttribute("list", "opal-room-selector-data");
+roomSelector.appendChild(roomInput);
+
+var inputData = document.createElement("datalist");
+inputData.id = "opal-room-selector-data";
+ocat._chatIds = new Set();
+ocat._hooks.addChatId = function(id) {
+	if(ocat._chatIds.has(id)) return;
+	ocat._chatIds.add(id);
+	var option = document.createElement("option");
+	option.value = id;
+	inputData.appendChild(option);
+};
+addChatId("main");
+roomInput.addEventListener("change", e => {
+	if(!e.target.value) return;
+	gotoRoom(e.target.value);
+	roomInput.value = "";
+	document.getElementById("input").focus();
+});
+roomSelector.appendChild(inputData);
+messageToolbar.prepend(roomSelector);
+
+var ocat_patchGotoRoom = gotoRoom.toString()
+	.replace(/(location\.replace)/g, "if(!location.href || location.href.substring(1) != room) $1")
+	.replace("{", "{ocat._hooks.addChatId(room);");
+gotoRoom = (new Function(`return (${ocat_patchGotoRoom})`))();
+
 document.getElementById("message-input").replaceWith(messageToolbar);
 
 var sidebar = document.createElement("div");
@@ -1887,6 +1933,7 @@ patch("message",
 			}
 		});
 		msg`)
+		.replace(/if\s*\((.*?)\)/, "if(($1) || ocat.showAllMessages)")
 		// .replace(/^\s*(function\s*)\(((?:[a-zA-Z_0-9]+(?:\s*=\s*.*?)?),?\s*)*\)/, "$1($2, ocat_id)")
 		// .replace(/^\s*\(?((?:[a-zA-Z_0-9]+(?:\s*=(?!>)\s*.*?)?,?\s*)*)\)?(\s*=>)/, "($1, ocat_id)$2")
 		.replace(/([a-zA-Z0-9_]+)\.style\.color\s*=\s*(['"`])blue\2/g,
@@ -1907,6 +1954,7 @@ patch("html-message",
 	c => c
 		.replace(/(?<!function\s*\((?:[a-zA-Z_0-9]+(?:\s*=(?!>)\s*.*?)?,\s*)*)msg(?!(?:,\s*[a-zA-Z_0-9]+(?:\s*=(?!>)\s*.*?)?)*\)?\s*=>)/g,
 			"((ocat.antiXss ? ocat._hooks.antiXss(ocat._hooks.htmlMsg(msg, id)) : ocat._hooks.htmlMsg(msg, id)))")
+		.replace(/if\s*\((.*?)\)/, "if(($1) || ocat.showAllMessages)")
 		// .replace(/^\s*(function\s*)\(((?:[a-zA-Z_0-9]+(?:\s*=\s*.*?)?),?\s*)*\)/, "$1($2, ocat_id)")
 		// .replace(/^\s*\(?((?:[a-zA-Z_0-9]+(?:\s*=(?!>)\s*.*?)?,?\s*)*)\)?(\s*=>)/, "($1, ocat_id)$2")
 		.replace(/(document\.getElementById\((['"`])message-container\2\).appendChild)\((.*)\)/,
@@ -1955,6 +2003,10 @@ window.addEventListener("click", e => {
 });
 
 document.getElementById("message-container").scrollTop = document.getElementById("message-container").scrollHeight;
+
+window.addEventListener("hashchange", e => {
+	gotoRoom(location.hash ? location.hash.substring(1) : 'main');
+});
 
 socket.emit("message-history", currentRoom);
 ocat._hooks.updateUserData(username, { active: true });

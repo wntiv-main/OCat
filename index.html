@@ -402,6 +402,7 @@
                 var typingUsers = {};
                 socket.on("typing", (room, user, typing) => {
                     if(!(room in typingUsers)) typingUsers[room] = new Set();
+                    if(!(currentRoom in typingUsers)) typingUsers[currentRoom] = new Set();
             if (typing) {
                 typingUsers[room].add(user);
             } else {
