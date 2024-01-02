@@ -1825,9 +1825,9 @@ ocat._hooks.htmlMsg = (msg, id) => {
 	var ping = sandbox.content.querySelector(".ocat-user-ping-message");
 	var js = sandbox.content.querySelector("img[onload]");
 	if(namePrefix && /^-?(.*?)-?(?::\s*|\n\s*)$/.test(namePrefix.textContent)) {
-		namePrefix.textContent = namePrefix.textContent.replace(/^-?(.*?)-?(?::\s*|\n\s*)$/, "$1");
-		ocat._hooks.updateUserData(namePrefix.textContent, { active: true });
-		if(ocat.blockedUsers.has(namePrefix.textContent)) {
+		var name = namePrefix.textContent.replace(/^-?(.*?)-?(?::\s*|\n\s*)$/, "$1");
+		ocat._hooks.updateUserData(name, { active: true });
+		if(ocat.blockedUsers.has(name)) {
 			namePrefix.classList.add("ocat-blocked");
 		}
 	} else if(!ping) {
@@ -1891,7 +1891,7 @@ patch("message",
 				ocat_prefix = document.createElement("span");
 				if(ocat.blockedUsers.has(uname)) ocat_prefix.classList.add('ocat-blocked');
 				ocat_prefix.classList.add('ocat-left');
-				ocat_prefix.textContent = uname;
+				ocat_prefix.textContent = ocat._decorateName(uname);
 				msg = newMsg;
 			}
 		});
