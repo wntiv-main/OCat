@@ -1057,7 +1057,7 @@ body {
 }
 
 #ocat-member-list li::after {
-	content: attr(data-channel);
+	content: attr(data-room-id);
 	float: right;
 	color: #777;
 	font-size: 0.8em;
@@ -1077,6 +1077,18 @@ body {
 #ocat-member-list li.ocat-online {
 	border-left: 10px solid green;
 	order: -1;
+}
+
+#ocat-member-list li.ocat-typing::before {
+	content: "";
+	background-image: url(https://assets-v2.lottiefiles.com/a/57f6e96a-117f-11ee-b56d-e33bc9416452/ibgqn49kqf.gif);
+	width: 1em;
+	height: 1em;
+	display: inline-block;
+	background-size: contain;
+	transform: scale(2, -2) translateY(-4px);
+	margin: 0 1em 0 0.5em;
+	filter: invert(1) brightness(0.5) blur(0.3px);
 }
 
 .ocat-footer-room-id {
@@ -1488,7 +1500,7 @@ nameInput.addEventListener("change", e => {
 	if(ocat._oldUsername in ocat._userHistory) {
 		ocat._userHistory[ocat._oldUsername].element.remove();
 		ocat._hooks.updateUserData(e.target.value, {
-			active: true,
+			room: currentRoom,
 			online: ocat._userHistory[ocat._oldUsername].online,
 		});
 		delete ocat._userHistory[ocat._oldUsername];
@@ -1719,16 +1731,20 @@ ocat._hooks.pingUsers = () => {
 
 ocat._hooks.updateUserData = (user, data) => {
 	if(!(user in ocat._userHistory)) {
-		if(user.startsWith("[DM] ")) user = user.substring(5);
+		if(user.startsWith("[DM] ")) return;
 		if(user.startsWith("[OCat]") || user == "Help") return;
 		var el = document.createElement("li");
 		el.textContent = user;
 		ocat._userHistory[user] = {
 			online: false,
+			room: null,
 			lastOnline: null,
 			lastActive: null,
 			element: el,
 		};
+		el.addEventListener("click", e => {
+			gotoRoom(ocat._userHistory[e.target.textContent]);
+		});
 		el.addEventListener("contextmenu", e => ocat._showContextMenu(e, [
 			{
 				label: ocat.blockedUsers.has(e.target.textContent) ? "Unblock" : "Block",
@@ -1746,15 +1762,22 @@ ocat._hooks.updateUserData = (user, data) => {
 		ocat._userHistory[user].element.classList.toggle("ocat-online", data.online);
 		ocat._userHistory[user].lastOnline = Date.now();
 	}
-	if("active" in data) {
+	if("room" in data) {
 		ocat._userHistory[user].lastActive = Date.now();
+		ocat._userHistory[user].room = data.room;
+		ocat._userHistory[user].element.dataset.ocatRoomId = data.room;
 		if(!ocat._userHistory[user].online) ocat._hooks.pingUsers();
+	}
+	if("typing" in data && ocat._userHistory[user].typing != data.typing) {
+		ocat._userHistory[user].typing = data.typing;
+		ocat._userHistory[user].element.classList.toggle("ocat-typing", data.typing);
+		ocat._userHistory[user].lastActive = Date.now();
 	}
 };
 
 ocat._hooks.possibleConnectMessage = (m) => {
 	if(/^(.*) joined\s*the\s*chat.*$/i.test(m)) {
-		ocat._hooks.updateUserData(m.replace(/^(.*) joined\s*the\s*chat.*$/i, "$1"), { active: true });
+		ocat._hooks.pingUsers();
 	}
 	if(/^(.*) left\s*the\s*chat.*$/i.test(m)) {
 		ocat._hooks.updateUserData(m.replace(/^(.*) left\s*the\s*chat.*$/i, "$1"), { online: false });
@@ -1870,7 +1893,7 @@ ocat._hooks.htmlMsg = (msg, id, room) => {
 	var js = sandbox.content.querySelector("img[onload]");
 	if(namePrefix && /^-?(.*?)-?(?::\s*|\n\s*)$/.test(namePrefix.textContent)) {
 		var name = namePrefix.textContent.replace(/^-?(.*?)-?(?::\s*|\n\s*)$/, "$1");
-		ocat._hooks.updateUserData(name, { active: true });
+		ocat._hooks.updateUserData(name, { room: room });
 		if(ocat.showAllMessages) {
 			namePrefix.textContent = `[#${room || "GLOBAL"}] ${namePrefix.textContent.replace(/^(.*?)(?::\s*|\n\s*)$/, "$1")}`;
 		}
@@ -1940,7 +1963,7 @@ patch("message",
 		var ocat_prefix = null;
 		ocat._extractUserMessage(msg, function(uname, newMsg) {
 			if(uname) {
-				ocat._hooks.updateUserData(uname, {active: true});
+				ocat._hooks.updateUserData(uname, {room: room});
 				ocat_prefix = document.createElement("span");
 				if(ocat.blockedUsers.has(uname)) ocat_prefix.classList.add('ocat-blocked');
 				ocat_prefix.classList.add('ocat-left');
@@ -1997,10 +2020,14 @@ patch("typing",
 	});
 });
 
+socket.on("typing", (room, user, typing) => {
+	ocat._hooks.updateUserData(user, { room: room, typing: typing });
+});
+
 socket.on("pongUser", (user, id, room) => {
 	socket.emit("delete-message", id);
 	if(user)
-		ocat._hooks.updateUserData(user, { online: true });
+		ocat._hooks.updateUserData(user, { online: true, room: room });
 });
 
 // Load settings
@@ -2030,7 +2057,7 @@ window.addEventListener("hashchange", e => {
 });
 
 socket.emit("message-history", currentRoom);
-ocat._hooks.updateUserData(username, { active: true });
+ocat._hooks.updateUserData(username, { room: currentRoom });
 setInterval(ocat._hooks.pingUsers, 30000);
 ocat._bannerMessage("success", "ocat ready!", 3000);
 setTimeout(() => {
