@@ -1317,6 +1317,11 @@ body {
 	text-align: center;
 	padding: 8px;
 }
+
+.opal-footer-room-id {
+	color: #777;
+	font-size: 0.8em;
+}
 `;
 document.head.appendChild(css);
 
@@ -1855,7 +1860,7 @@ ocat._hooks.antiXss = (msg) => {
 	return msg;
 };
 
-ocat._hooks.htmlMsg = (msg, id) => {
+ocat._hooks.htmlMsg = (msg, id, room) => {
 	var sandbox = document.createElement("template");
 	sandbox.innerHTML = msg;
 	var namePrefix = sandbox.content.querySelector(".ocat-left");
@@ -1864,11 +1869,20 @@ ocat._hooks.htmlMsg = (msg, id) => {
 	if(namePrefix && /^-?(.*?)-?(?::\s*|\n\s*)$/.test(namePrefix.textContent)) {
 		var name = namePrefix.textContent.replace(/^-?(.*?)-?(?::\s*|\n\s*)$/, "$1");
 		ocat._hooks.updateUserData(name, { active: true });
+		if(ocat.showAllMessages) {
+			namePrefix.textContent = `[#${room || "GLOBAL"}] ${namePrefix.textContent.replace(/^(.*?)(?::\s*|\n\s*)$/, "$1")}`;
+		}
 		if(ocat.blockedUsers.has(name)) {
 			namePrefix.classList.add("ocat-blocked");
 		}
 	} else if(!ping) {
 		ocat._hooks.pingUsers();
+		if(ocat.showAllMessages) {
+			var footer = document.createElement("div");
+			footer.classList.add("opal-footer-room-id");
+			footer.textContent = `#${room || "GLOBAL"}`;
+			sandbox.content.appendChild(footer);
+		}
 	}
 	if(js && js.getAttribute("onload").includes(";this.parentElement.remove();") && !js.classList.contains("ocat-persistant")) {
 		setTimeout(() => {
@@ -1928,8 +1942,12 @@ patch("message",
 				ocat_prefix = document.createElement("span");
 				if(ocat.blockedUsers.has(uname)) ocat_prefix.classList.add('ocat-blocked');
 				ocat_prefix.classList.add('ocat-left');
-				ocat_prefix.textContent = ocat._decorateName(uname);
+				ocat_prefix.textContent = ocat.showAllMessages ? \`[#\${room || "GLOBAL"}] \${ocat._decorateName(uname)}\` : ocat._decorateName(uname);
 				msg = newMsg;
+			} else if (ocat.showAllMessages) {
+				ocat_prefix = document.createElement("span");
+				ocat_prefix.classList.add('ocat-left');
+				ocat_prefix.textContent = \`[#\${room || "GLOBAL"}]\`;
 			}
 		});
 		msg`)
@@ -1953,7 +1971,7 @@ patch("html-message",
 	() => true,
 	c => c
 		.replace(/(?<!function\s*\((?:[a-zA-Z_0-9]+(?:\s*=(?!>)\s*.*?)?,\s*)*)msg(?!(?:,\s*[a-zA-Z_0-9]+(?:\s*=(?!>)\s*.*?)?)*\)?\s*=>)/g,
-			"((ocat.antiXss ? ocat._hooks.antiXss(ocat._hooks.htmlMsg(msg, id)) : ocat._hooks.htmlMsg(msg, id)))")
+			"((ocat.antiXss ? ocat._hooks.antiXss(ocat._hooks.htmlMsg(msg, id, room)) : ocat._hooks.htmlMsg(msg, id, room)))")
 		.replace(/if\s*\((.*?)\)/, "if(($1) || ocat.showAllMessages)")
 		// .replace(/^\s*(function\s*)\(((?:[a-zA-Z_0-9]+(?:\s*=\s*.*?)?),?\s*)*\)/, "$1($2, ocat_id)")
 		// .replace(/^\s*\(?((?:[a-zA-Z_0-9]+(?:\s*=(?!>)\s*.*?)?,?\s*)*)\)?(\s*=>)/, "($1, ocat_id)$2")
