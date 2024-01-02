@@ -1046,7 +1046,8 @@ body {
 }
 
 #ocat-member-list {
-	display: block;
+	display: flex;
+	flex-direction: column;
 	margin: 0;
 	padding: 0;
 	flex-grow: 1;
@@ -1083,6 +1084,7 @@ body {
 
 #ocat-member-list li.ocat-online {
 	border-left: 10px solid green;
+	order: -1;
 }
 
 .ocat-footer-room-id {
