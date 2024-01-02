@@ -1507,7 +1507,7 @@ roomSelector.appendChild(roomPrefix);
 
 var roomInput = document.createElement("input");
 roomInput.type = "text";
-roomInput.placeholder = room.substring(opal._USES_PREFIX_HASH ? 1 : 0);
+roomInput.placeholder = currentRoom;
 roomInput.value = "";
 roomInput.id = "opal-room-selector";
 roomInput.setAttribute("spellcheck", false);
