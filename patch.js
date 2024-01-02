@@ -17,7 +17,7 @@ var ocat = {
 		if(!matched) callback(undefined, msg);
 	},
 	_decorateName(username) {
-		return `-${username}-`;
+		return `${username}`;
 	},
 	_notification: new Audio(),
 	_currentNotification: null,
@@ -1825,8 +1825,9 @@ ocat._hooks.htmlMsg = (msg, id) => {
 	var ping = sandbox.content.querySelector(".ocat-user-ping-message");
 	var js = sandbox.content.querySelector("img[onload]");
 	if(namePrefix && /^-?(.*?)-?(?::\s*|\n\s*)$/.test(namePrefix.textContent)) {
-		ocat._hooks.updateUserData(namePrefix.textContent.replace(/^-?(.*?)-?(?::\s*|\n\s*)$/, "$1"), { active: true });
-		if(ocat.blockedUsers.has(namePrefix.textContent.replace(/^-?(.*?)-?(?::\s*|\n\s*)$/, "$1"))) {
+		namePrefix.textContent = namePrefix.textContent.replace(/^-?(.*?)-?(?::\s*|\n\s*)$/, "$1");
+		ocat._hooks.updateUserData(namePrefix.textContent, { active: true });
+		if(ocat.blockedUsers.has(namePrefix.textContent)) {
 			namePrefix.classList.add("ocat-blocked");
 		}
 	} else if(!ping) {
