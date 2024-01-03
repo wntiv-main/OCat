@@ -1618,7 +1618,13 @@ const ocat_classMap = {
 	"light-theme": "lightmode",
 	"udark-theme": "ultradarkmode",
 };
-[...document.querySelectorAll(".right.sidebar button.themebutton")].forEach(el => {
+
+(async (themeTooltip) => {
+	var response = await fetch("/user-settings");
+	var userSettingsDoc = (new DOMParser).parseFromString(
+		await response.text(),
+		response.headers.get("Content-Type"));
+	themeTooltip.prepend([...userSettingsDoc.querySelectorAll("button.themebutton")].map(el => {
 		// theme button
 		var themeClass = ocat_classMap[el.id]
 			|| el.id.replace(/-theme(\d*)$/, (/\b\w*mode\d*\b/i.test(el.className) ? "mode$1" : "theme$1"))
@@ -1641,8 +1647,9 @@ const ocat_classMap = {
 		}, {
 			capture: true
 		});
-		themeSelectorTooltip.appendChild(themeButton);
-});
+		return themeButton;
+	}));
+})(themeSelectorTooltip);
 
 var customThemeButton = document.createElement("input");
 customThemeButton.type = "file";
