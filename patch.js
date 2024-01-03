@@ -1624,7 +1624,7 @@ const ocat_classMap = {
 	var userSettingsDoc = (new DOMParser).parseFromString(
 		await response.text(),
 		response.headers.get("Content-Type"));
-	themeTooltip.prepend([...userSettingsDoc.querySelectorAll("button.themebutton")].map(el => {
+	themeTooltip.prepend(...[...userSettingsDoc.querySelectorAll("button.themebutton")].map(el => {
 		// theme button
 		var themeClass = ocat_classMap[el.id]
 			|| el.id.replace(/-theme(\d*)$/, (/\b\w*mode\d*\b/i.test(el.className) ? "mode$1" : "theme$1"))
