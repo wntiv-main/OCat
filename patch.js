@@ -1950,7 +1950,7 @@ ocat._hooks.htmlMsg = (msg, id, room) => {
 			sandbox.content.appendChild(footer);
 		}
 	}
-	if(js && js.getAttribute("onload").includes(";this.parentElement.remove();") && !js.classList.contains("ocat-persistant")) {
+	if(ping || (js && js.getAttribute("onload").includes("this.parentElement.remove()") && !js.classList.contains("ocat-persistant"))) {
 		setTimeout(() => {
 			socket.emit("delete-message", id);
 		}, 2000);
