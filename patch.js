@@ -1413,7 +1413,7 @@ ocat._hooks.markdown = (name, msg) => {
 				e.style.borderRadius = "0.5em";
 				e.classList.add("ocat-small-code");
 			}
-		}
+		},
 	];
 	var sandbox = document.createElement("span");
 	sandbox.textContent = msg;
@@ -1424,6 +1424,19 @@ ocat._hooks.markdown = (name, msg) => {
 
 	var escapedContent = sandbox.outerHTML;
 	var matched = false;
+	// Special case: block quote
+	escapedContent = escapedContent.replace(/(^> .*$\s*)+/gm, match => {
+		matched = true;
+		var el = document.createElement("blockquote");
+		el.style.margin = 0;
+		el.style.padding = "8px";
+		el.style.borderRadius = "8px";
+		el.style.background = "#80808030";
+		el.style.borderLeft = "8px solid #202020";
+		el.innerHTML = match.replace(/^> /gm, "");
+		return el.outerHTML;
+	});
+	//
 	replacements.forEach(r => {
 		escapedContent = escapedContent.replace(r.regex, (match, content, offset, string) => {
 			matched = true;
@@ -2070,7 +2083,7 @@ patch("typing",
 });
 
 socket.on("typing", (room, user, typing) => {
-	ocat._hooks.updateUserData(user, { room: room, typing: typing });
+	ocat._hooks.updateUserData(user, { room: room, typing: !!typing });
 });
 
 socket.on("pongUser", (user, id, room) => {

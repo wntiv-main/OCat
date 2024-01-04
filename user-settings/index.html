@@ -16,58 +16,6 @@
             color: white;
         }
 
-        #message-input {
-            width: 69%;
-            height: 20px;
-            position: fixed;
-            bottom: 5px;
-            left: 5em;
-            border-radius: 50px;
-        }
-
-        #name-selector {
-            border-radius: 50px;
-        }
-
-        #message-container > div {
-            margin-bottom: 10px;
-            width: 73%;
-            white-space: pre-line;
-        }
-
-        #message-container {
-            padding-bottom: 4em;
-            padding-left: 4em;
-        }
-
-        #typing-users.show-dots::before {
-            content: "";
-            background-image: url(../images/Typing-Dots.gif);
-            width: 2em;
-            height: 2em;
-            display: inline-block;
-            background-size: contain;
-            bottom: 0em;
-            margin-right: 10px;
-        }
-
-        #typing-users {
-            position: fixed;
-            bottom: 1.8em;
-            left: 5em;
-            backdrop-filter: blur(100px);
-            bottom: 2.5em;
-        }
-
-        #message-container > div:has(> .anti-flow-message) {
-            padding: 0;
-            height: 0px;
-            position: fixed;
-            top: -1000px;
-            background: transparent !important;
-        }
-
-
         .lightmode {
             background-color: white;
             color: black;
@@ -173,12 +121,12 @@
 
         .sidebar {
             position: fixed;
-            width: 25%;
+            width: 100%;
             backdrop-filter: blur(10px);
         }
 
         .right {
-            right: 0px;
+            left: 5em;
             top: 0px;
         }
 
@@ -214,6 +162,7 @@
             background-image: url(/images/pluz.png);
             background-size: cover;
         }
+
         .settings-button {
             cursor: pointer;
             width: 5em;
@@ -296,137 +245,143 @@
 
     <div class="left-sidebar">
 
-        <button class="button disabled home-button"> </button>
+        <a href="/" target="_self"><button class="button home-button"> </button></a>
         <button class="button disabled pluz-button"> </button>
-        <a href="/user-settings" target="_self"><button class="button settings-button"> </button></a>
+        <button class="button disabled settings-button"> </button>
 
     </div>
 
     <div class="right sidebar">
 
-        <h1>Welcome To CCat</h1>
-
-        <p>Be nice to people</p>
-
-        <h1>Username</h1>
+        <h1>Appearance</h1>
         <p>(Beta)</p>
+        <p>Themes</p>
 
-        <input id="name-selector" />
+        <button class="button themebutton" id="light-theme"> </button>
+
+        <button class="button themebutton darkmode1" id="dark-theme"> </button>
+
+        <button class="button themebutton ultradarkmode1" id="udark-theme"> </button>
+
+
+        <p>Colours</p>
+        <!-- blue -->
+        <button class="button themebutton bluetheme1" id="blue-theme"> </button>
+        <!-- red -->
+        <button class="button themebutton redtheme1" id="red-theme"> </button>
+        <!-- yellow -->
+        <button class="button themebutton yellowtheme1" id="yellow-theme"> </button>
+        <!-- green -->
+        <button class="button themebutton greentheme1" id="green-theme"> </button>
+        <!-- rainbow -->
+        <button class="button themebutton rainbowtheme1" id="rainbow-theme-one"> </button>
+        <!-- rainbow -->
+        <button class="button themebutton rainbowtheme2" id="rainbow-theme-two"> </button>
+
+
+        <p>Images</p>
+        <!-- minecraft1 -->
+        <button class="button themebutton mctheme1" id="minecraft-theme-one"> </button>
+
+        <!-- minecraft2 -->
+        <button class="button themebutton mctheme2" id="minecraft-theme-two"> </button>
+
+        <!-- minecraft3 -->
+        <button class="button themebutton mctheme3" id="minecraft-theme-three"> </button>
+
+        <!-- minecraft4 -->
+        <button class="button themebutton mctheme4" id="minecraft-theme-four"> </button>
+
+        <!-- gdash1 -->
+        <button class="button themebutton gdtheme1" id="geometry-dash-theme-one"> </button>
+
+        <!-- gdash2 -->
+        <!-- <button id="geometry-dash-theme-two">Geometry Dash Theme 2</button> -->
+        <!-- gdash1 -->
+        <button class="button themebutton teartheme1" id="teardown-theme-one"> </button>
 
     </div>
-
-    <div id="message-container">
-    </div>
-    <div id="typing-users"></div>
-    <input id="message-input" />
     <script>
-        function gotoRoom(room) {
-            location.replace(`#${room}`);
-            socket.emit("typing", currentRoom, username, false);
-            currentRoom = room;
-        }
-        var currentRoom = location.hash ? location.hash.substring(1) : (location.replace('#main'), 'main');
-        var typingIdle = -1;
-        if (!("username" in localStorage)) {
-            localStorage.username = prompt("Enter your username:");
-        }
-        var username = localStorage.username;
-        document.getElementById("name-selector").value = username;
-
         document.body.className = localStorage.theme || "darkmode";
-
-        const socket = io();
-        socket.on('message', console.log);
-        socket.on("message", (room, id, msg) => {
-            if (room && room != currentRoom) return;
-            var finalContent = [];
-            msg.split(" ").forEach((v, i) => {
-                if (i) {
-                    if (typeof (finalContent[0]) == "string") {
-                        finalContent[0] += " ";
-                    } else finalContent.unshift(" ");
-                }
-                // https://stackoverflow.com/a/3809435
-                if (/(http(s)?:\/\/.)(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/g.test(v)) {
-                    var el = document.createElement("a");
-                    el.href = v;
-                    el.textContent = v;
-                    el.style.textDecoration = "underline";
-                    el.style.color = "blue";
-                    el.style.cursor = "pointer";
-                    finalContent.unshift(el);
-                } else {
-                    if (i) {
-                        finalContent[0] += v;
-                    } else finalContent.unshift(v);
-                }
-            });
-            var item = document.createElement('div');
-            item.append(...(finalContent.reverse()));
-            item.dataset.messageId = id;
-            document.getElementById("message-container").appendChild(item);
-            if (document.scrollingElement.scrollHeight - document.scrollingElement.scrollTop - document.scrollingElement.clientHeight - item.getBoundingClientRect().height < 100)
-                window.scrollTo(0, document.scrollingElement.scrollHeight);
+        //gray
+        document.getElementById("dark-theme").addEventListener("click", e => {
+            document.body.className = "darkmode";
+            localStorage.theme = "darkmode";
         });
-
-        document.getElementById("message-input").addEventListener("keypress", e => {
-            socket.emit("typing", currentRoom, username, !!e.target.value);
-            clearTimeout(typingIdle);
-            typingIdle = setTimeout(() => socket.emit("typing", currentRoom, username, false), 3e3);
-            if (e.key == "Enter" && e.target.value.trim()) {
-                socket.emit("typing", currentRoom, username, false);
-                if (e.target.value.trim() == "/help") {
-                    socket.listeners("message").forEach(c => c(
-                        `Help: /help: Show this menu.`));
-                    e.target.value = "";
-                    return;
-                }
-                socket.emit("message", currentRoom, `-${username}-\n${e.target.value.trim()}`);
-                e.target.value = "";
-            }
+        //black
+        document.getElementById("udark-theme").addEventListener("click", e => {
+            document.body.className = "ultradarkmode";
+            localStorage.theme = "ultradarkmode";
         });
-
-        var typingUsers = {};
-        socket.on("typing", (room, user, typing) => {
-            if (!(room in typingUsers)) typingUsers[room] = new Set();
-            if (!(currentRoom in typingUsers)) typingUsers[currentRoom] = new Set();
-            if (typing) {
-                typingUsers[room].add(user);
-            } else {
-                typingUsers[room].delete(user);
-            }
-            // show users to screen
-            document.getElementById("typing-users").textContent = [...typingUsers[currentRoom]].join(", ");
-            document.getElementById("typing-users").classList.toggle("show-dots", !!typingUsers[currentRoom].size);
+        //white
+        document.getElementById("light-theme").addEventListener("click", e => {
+            document.body.className = "lightmode";
+            localStorage.theme = "lightmode";
         });
-
-        socket.on('html-message', function (room, id, msg) {
-            if (room && room != currentRoom) return;
-            var item = document.createElement('div');
-            item.innerHTML = msg;
-            item.dataset.messageId = id;
-            document.getElementById("message-container").appendChild(item);
-            if (document.scrollingElement.scrollHeight - document.scrollingElement.scrollTop - document.scrollingElement.clientHeight - item.getBoundingClientRect().height < 100)
-                window.scrollTo(0, document.scrollingElement.scrollHeight);
+        //blue
+        document.getElementById("blue-theme").addEventListener("click", e => {
+            document.body.className = "bluetheme";
+            localStorage.theme = "bluetheme";
         });
-        //name selector
-        document.getElementById("name-selector").addEventListener("change", e => {
-            username = e.target.value;
-            localStorage.username = username;
+        //red
+        document.getElementById("red-theme").addEventListener("click", e => {
+            document.body.className = "redtheme";
+            localStorage.theme = "redtheme";
         });
-        //leave messages
-        window.addEventListener("beforeunload", e => {
-            socket.emit("message", null, username + " Left The Chat. \u{1F44B}");
+        //yellow
+        document.getElementById("yellow-theme").addEventListener("click", e => {
+            document.body.className = "yellowtheme";
+            localStorage.theme = "yellowtheme";
         });
-        window.alert = msg => { };
-
-        socket.on("delete-message", id => {
-            var el = document.querySelector(`#message-container > div[data-message-id="${id}"]`);
-            if (el) el.remove();
+        //green
+        document.getElementById("green-theme").addEventListener("click", e => {
+            document.body.className = "greentheme";
+            localStorage.theme = "greentheme";
         });
-
-        socket.emit("message-history", currentRoom);
-        socket.emit('message', null, `${username} Joined The Chat. \u{1F44B}`);
+        //rainbow
+        document.getElementById("rainbow-theme-one").addEventListener("click", e => {
+            document.body.className = "rainbowthemeone";
+            localStorage.theme = "rainbowthemeone";
+        });
+        //rainbow
+        document.getElementById("rainbow-theme-two").addEventListener("click", e => {
+            document.body.className = "rainbowthemetwo";
+            localStorage.theme = "rainbowthemetwo";
+        });
+        //minecraft image 1
+        document.getElementById("minecraft-theme-one").addEventListener("click", e => {
+            document.body.className = "minecraftthemeone";
+            localStorage.theme = "minecraftthemeone";
+        });
+        //minecraft image 2
+        document.getElementById("minecraft-theme-two").addEventListener("click", e => {
+            document.body.className = "minecraftthemetwo";
+            localStorage.theme = "minecraftthemetwo";
+        });
+        //minecraft image 3
+        document.getElementById("minecraft-theme-three").addEventListener("click", e => {
+            document.body.className = "minecraftthemethree";
+            localStorage.theme = "minecraftthemethree";
+        });
+        //minecraft image 4
+        document.getElementById("minecraft-theme-four").addEventListener("click", e => {
+            document.body.className = "minecraftthemefour";
+            localStorage.theme = "minecraftthemefour";
+        });
+        //gdash image 1
+        document.getElementById("geometry-dash-theme-one").addEventListener("click", e => {
+            document.body.className = "geometrydashthemeone";
+            localStorage.theme = "geometrydashthemeone";
+        });
+        //gdash image 2
+        //document.getElementById("geometry-dash-theme-two").addEventListener("click", e => {
+        //    document.body.className = "geometrydashthemetwo";
+        //});
+        //teardown image 1
+        document.getElementById("teardown-theme-one").addEventListener("click", e => {
+            document.body.className = "teardownthemeone";
+            localStorage.theme = "teardownthemeone";
+        });
     </script>
 </body>
 
