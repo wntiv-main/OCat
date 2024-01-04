@@ -1348,9 +1348,13 @@ body {
 	padding: 8px;
 }
 
-.opal-footer-room-id {
+.opal-footer-room-id::after {
 	color: #777;
 	font-size: 0.8em;
+}
+
+.ocat-room-id::before {
+	content: "[#" attr(ocat-room-id);
 }
 `;
 document.head.appendChild(css);
@@ -1932,23 +1936,18 @@ ocat._hooks.htmlMsg = (msg, id, room) => {
 	var namePrefix = sandbox.content.querySelector(".ocat-left");
 	var ping = sandbox.content.querySelector(".ocat-user-ping-message");
 	var js = sandbox.content.querySelector("img[onload]");
-	if(namePrefix && /^-?(.*?)-?(?::\s*|\n\s*)$/.test(namePrefix.textContent)) {
-		var name = namePrefix.textContent.replace(/^-?(.*?)-?(?::\s*|\n\s*)$/, "$1");
+	if(namePrefix && /^-?(.*?)-?(?::\s*|\n\s*)?$/.test(namePrefix.textContent)) {
+		var name = namePrefix.textContent.replace(/^-?(.*?)-?(?::\s*|\n\s*)?$/, "$1");
 		ocat._hooks.updateUserData(name, { room: room });
 		if(ocat.showAllMessages) {
-			namePrefix.textContent = `[#${room || "GLOBAL"}] ${namePrefix.textContent.replace(/^(.*?)(?::\s*|\n\s*)$/, "$1")}`;
+			namePrefix.dataset.ocatRoomId = room || "GLOBAL";
+			namePrefix.classList.add("ocat-room-id");
 		}
 		if(ocat.blockedUsers.has(name)) {
 			namePrefix.classList.add("ocat-blocked");
 		}
 	} else if(!ping) {
 		ocat._hooks.pingUsers();
-		if(ocat.showAllMessages) {
-			var footer = document.createElement("div");
-			footer.classList.add("opal-footer-room-id");
-			footer.textContent = `#${room || "GLOBAL"}`;
-			sandbox.content.appendChild(footer);
-		}
 	}
 	if(ping || (js && js.getAttribute("onload").includes("this.parentElement.remove()") && !js.classList.contains("ocat-persistant"))) {
 		setTimeout(() => {
@@ -1971,6 +1970,10 @@ ocat._hooks.onMessageContainer = (el, msg, id, type) => {
 		&& (/^(.*[^:\n]) joined\s*the\s*chat.*\.?\s*$/i.test(msg)
 			|| /^(.*[^:\n]) left\s*the\s*chat.*\.?\s*$/i.test(msg))) {
 		el.classList.add("ocat-system-message");
+	}
+	if(ocat.showAllMessages && !el.classList.contains("anti-flow-message") && type.toUpperCase() == "HTML" && !el.querySelector(":scope > .ocat-left")) {
+		el.dataset.ocatRoomId = room || "GLOBAL";
+		el.classList.add("ocat-footer-room-id");
 	}
 	el.addEventListener("contextmenu", e => ocat._showContextMenu(e, [
 		{
@@ -2008,12 +2011,17 @@ patch("message",
 				ocat_prefix = document.createElement("span");
 				if(ocat.blockedUsers.has(uname)) ocat_prefix.classList.add('ocat-blocked');
 				ocat_prefix.classList.add('ocat-left');
-				ocat_prefix.textContent = ocat.showAllMessages ? \`[#\${room || "GLOBAL"}] \${ocat._decorateName(uname)}\` : ocat._decorateName(uname);
+				ocat_prefix.textContent = ocat._decorateName(uname);
+				if(ocat.showAllMessages) {
+					ocat_prefix.dataset.ocatRoomId = room || "GLOBAL";
+					ocat_prefix.classList.add("ocat-room-id");
+				}
 				msg = newMsg;
 			} else if (ocat.showAllMessages) {
 				ocat_prefix = document.createElement("span");
 				ocat_prefix.classList.add('ocat-left');
-				ocat_prefix.textContent = \`[#\${room || "GLOBAL"}]\`;
+				ocat_prefix.dataset.ocatRoomId = room || "GLOBAL";
+				ocat_prefix.classList.add("ocat-room-id");
 			}
 		});
 		msg`)
